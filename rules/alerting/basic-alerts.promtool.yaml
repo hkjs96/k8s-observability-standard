@@ -1,0 +1,27 @@
+groups:
+  - name: basic.kubernetes.alerting
+    rules:
+      - alert: BasicPrometheusTargetDown
+        expr: |
+          100 * (
+            count by (job, namespace) (up == 0)
+            /
+            count by (job, namespace) (up)
+          ) > 10
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "More than 10 percent of targets are down for a job."
+          description: "Job {{ $labels.job }} in namespace {{ $labels.namespace }} has unhealthy scrape targets."
+          runbook_url: "https://runbooks.example.invalid/observability/basic-target-down"
+      - alert: BasicPrometheusRuleEvaluationFailures
+        expr: |
+          increase(prometheus_rule_evaluation_failures_total[10m]) > 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Prometheus rule evaluation failures detected."
+          description: "Prometheus has reported rule evaluation failures in the last 10 minutes."
+          runbook_url: "https://runbooks.example.invalid/observability/rule-evaluation-failures"

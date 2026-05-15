@@ -1,0 +1,36 @@
+# Small sizing overlay for a proof-of-concept or small cluster.
+
+prometheus:
+  prometheusSpec:
+    resources:
+      requests:
+        cpu: 500m
+        memory: 2Gi
+      limits:
+        memory: 4Gi
+    storageSpec: {}
+
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        memory: 512Mi
+
+grafana:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 512Mi
+
+prometheusOperator:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 512Mi

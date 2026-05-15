@@ -1,0 +1,40 @@
+# Large sizing overlay.
+# Treat this as a starting worksheet, not a production guarantee.
+
+prometheus:
+  prometheusSpec:
+    replicas: 2
+    shards: 2
+    resources:
+      requests:
+        cpu: "4"
+        memory: 16Gi
+      limits:
+        memory: 32Gi
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 500Gi
+
+alertmanager:
+  alertmanagerSpec:
+    replicas: 3
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        memory: 1Gi
+
+grafana:
+  replicas: 2
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      memory: 2Gi

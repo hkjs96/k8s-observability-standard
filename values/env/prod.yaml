@@ -1,0 +1,20 @@
+# Fictional production overlay.
+# Implementation repositories must replace example labels with their own values.
+
+commonLabels:
+  observability.standard/environment: prod
+
+grafana:
+  replicas: 2
+
+prometheus:
+  prometheusSpec:
+    replicas: 2
+    retention: 30d
+    externalLabels:
+      cluster: example-prod
+      environment: prod
+
+alertmanager:
+  alertmanagerSpec:
+    replicas: 2

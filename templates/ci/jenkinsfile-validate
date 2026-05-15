@@ -1,0 +1,11 @@
+pipeline {
+  agent any
+
+  stages {
+    stage('Validate Observability Standard') {
+      steps {
+        sh 'go run ./cmd/obsctl validate'
+      }
+    }
+  }
+}

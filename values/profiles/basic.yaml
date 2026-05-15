@@ -1,0 +1,34 @@
+# Basic profile overlay.
+# Metrics and the embedded Grafana UI only.
+
+defaultRules:
+  create: true
+
+grafana:
+  enabled: true
+  sidecar:
+    dashboards:
+      enabled: true
+    datasources:
+      enabled: true
+
+prometheus:
+  enabled: true
+  prometheusSpec:
+    replicas: 1
+    shards: 1
+    walCompression: true
+    scrapeInterval: 30s
+    evaluationInterval: 30s
+
+alertmanager:
+  enabled: true
+
+kube-state-metrics:
+  enabled: true
+
+prometheus-node-exporter:
+  enabled: true
+
+windowsMonitoring:
+  enabled: false

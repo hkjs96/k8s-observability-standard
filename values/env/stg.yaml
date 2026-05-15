@@ -1,0 +1,18 @@
+# Fictional staging overlay.
+
+commonLabels:
+  observability.standard/environment: stg
+
+grafana:
+  replicas: 1
+
+prometheus:
+  prometheusSpec:
+    retention: 15d
+    externalLabels:
+      cluster: example-stg
+      environment: stg
+
+alertmanager:
+  alertmanagerSpec:
+    replicas: 1

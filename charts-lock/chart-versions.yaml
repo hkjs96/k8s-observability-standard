@@ -1,0 +1,16 @@
+apiVersion: observability.standard/v1
+kind: ChartVersions
+metadata:
+  name: phase-0-2
+spec:
+  reviewedAt: "2026-05-14"
+  charts:
+    kube-prometheus-stack:
+      repository: https://prometheus-community.github.io/helm-charts
+      chart: kube-prometheus-stack
+      version: 85.0.2
+      appVersion: v0.90.1
+      source: https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
+      notes:
+        - "Pinned for the Basic profile baseline."
+        - "Review CRD upgrade notes before changing this version."

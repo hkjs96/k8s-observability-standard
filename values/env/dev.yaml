@@ -1,0 +1,18 @@
+# Fictional development overlay.
+
+commonLabels:
+  observability.standard/environment: dev
+
+grafana:
+  replicas: 1
+
+prometheus:
+  prometheusSpec:
+    retention: 7d
+    externalLabels:
+      cluster: example-dev
+      environment: dev
+
+alertmanager:
+  alertmanagerSpec:
+    replicas: 1

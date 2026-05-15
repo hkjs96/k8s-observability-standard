@@ -1,0 +1,160 @@
+# Common baseline for prometheus-community/kube-prometheus-stack.
+# Keep this file free of implementation-specific runtime values.
+
+fullnameOverride: kube-prometheus-stack
+namespaceOverride: monitoring
+
+commonLabels:
+  observability.standard/component: metrics
+  observability.standard/profile: basic
+
+crds:
+  enabled: true
+  upgradeJob:
+    enabled: false
+
+defaultRules:
+  create: true
+  rules:
+    alertmanager: true
+    etcd: false
+    kubeControllerManager: true
+    kubeSchedulerAlerting: true
+    kubeSchedulerRecording: true
+    kubernetesApps: true
+    kubernetesResources: true
+    kubernetesStorage: true
+    kubernetesSystem: true
+    node: true
+    prometheus: true
+    prometheusOperator: true
+  labels:
+    observability.standard/rule-source: upstream
+
+alertmanager:
+  enabled: true
+  apiVersion: v2
+  config:
+    global:
+      resolve_timeout: 5m
+    route:
+      group_by:
+        - namespace
+        - alertname
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 12h
+      receiver: "null"
+      routes:
+        - receiver: "null"
+          matchers:
+            - alertname = "Watchdog"
+    receivers:
+      - name: "null"
+  alertmanagerSpec:
+    replicas: 1
+    retention: 120h
+    storage: {}
+    externalUrl: ""
+  service:
+    type: ClusterIP
+
+grafana:
+  enabled: true
+  defaultDashboardsEnabled: true
+  defaultDashboardsTimezone: browser
+  admin:
+    existingSecret: grafana-admin
+    userKey: admin-user
+    passwordKey: admin-password
+  service:
+    type: ClusterIP
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      labelValue: "1"
+      searchNamespace: monitoring
+      folderAnnotation: grafana_folder
+      provider:
+        allowUiUpdates: false
+        foldersFromFilesStructure: true
+    datasources:
+      enabled: true
+      defaultDatasourceEnabled: true
+  additionalDataSources: []
+
+prometheus:
+  enabled: true
+  service:
+    type: ClusterIP
+  prometheusSpec:
+    replicas: 1
+    retention: 15d
+    retentionSize: ""
+    externalLabels:
+      cluster: example-cluster
+      environment: example-environment
+    serviceMonitorSelector: {}
+    podMonitorSelector: {}
+    probeSelector: {}
+    ruleSelector: {}
+    serviceMonitorNamespaceSelector: {}
+    podMonitorNamespaceSelector: {}
+    ruleNamespaceSelector: {}
+    scrapeConfigSelector: {}
+    scrapeConfigNamespaceSelector: {}
+    enableAdminAPI: false
+    enableRemoteWriteReceiver: false
+    resources:
+      requests:
+        cpu: 500m
+        memory: 2Gi
+      limits:
+        memory: 4Gi
+    storageSpec: {}
+
+prometheusOperator:
+  enabled: true
+  admissionWebhooks:
+    enabled: true
+    patch:
+      enabled: true
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 512Mi
+
+kube-state-metrics:
+  enabled: true
+  metricLabelsAllowlist:
+    - namespaces=[team,environment]
+    - pods=[app.kubernetes.io/name,app.kubernetes.io/component]
+    - services=[app.kubernetes.io/name]
+
+prometheus-node-exporter:
+  enabled: true
+  prometheus:
+    monitor:
+      enabled: true
+      relabelings:
+        - sourceLabels:
+            - __meta_kubernetes_pod_node_name
+          targetLabel: node
+
+nodeExporter:
+  enabled: true
+
+kubeEtcd:
+  enabled: false
+
+kubeControllerManager:
+  enabled: true
+
+kubeScheduler:
+  enabled: true
+
+kubeProxy:
+  enabled: true

@@ -1,0 +1,11 @@
+stages:
+  - validate
+
+validate-observability-standard:
+  stage: validate
+  image: golang:1.22
+  script:
+    - go run ./cmd/obsctl validate
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

@@ -1,0 +1,36 @@
+# Medium sizing overlay.
+# Validate against active series, samples/sec, dashboard users, and retention.
+
+prometheus:
+  prometheusSpec:
+    resources:
+      requests:
+        cpu: "2"
+        memory: 8Gi
+      limits:
+        memory: 16Gi
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 200Gi
+
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        memory: 1Gi
+
+grafana:
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      memory: 1Gi

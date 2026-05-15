@@ -1,0 +1,19 @@
+groups:
+  - name: basic.kubernetes.recording
+    interval: 30s
+    rules:
+      - record: namespace:container_cpu_usage_seconds_total:sum_rate5m
+        expr: |
+          sum by (namespace) (
+            rate(container_cpu_usage_seconds_total{container!="",pod!=""}[5m])
+          )
+      - record: namespace:container_memory_working_set_bytes:sum
+        expr: |
+          sum by (namespace) (
+            container_memory_working_set_bytes{container!="",pod!=""}
+          )
+      - record: node:node_cpu_utilisation:ratio_rate5m
+        expr: |
+          1 - avg by (node) (
+            rate(node_cpu_seconds_total{mode="idle"}[5m])
+          )
