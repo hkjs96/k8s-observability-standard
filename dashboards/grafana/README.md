@@ -4,11 +4,14 @@ The Basic profile starts with the upstream dashboards shipped by
 `kube-prometheus-stack`. Additional dashboards from prior PoC work must be
 reviewed and sanitized before being copied here.
 
-## Candidate Set For Phase 2 Review
+## Added
 
-- Cluster overview
+- `cluster-overview.yaml` — CPU/memory by namespace, node CPU utilisation
+- `namespace-overview.yaml` — per-namespace CPU/memory/pod status with namespace variable
+
+## Remaining Candidates For Phase 2 Review
+
 - Node overview
-- Namespace overview
 - Workload resources
 - Pod status timeline
 - HPA overview

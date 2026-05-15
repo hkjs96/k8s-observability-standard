@@ -1,0 +1,44 @@
+# Fictional EKS overlay. Replace all values in an implementation repository.
+# EKS does not expose etcd, kube-controller-manager, or kube-scheduler metrics
+# by default, so those components are disabled here.
+
+kubeEtcd:
+  enabled: false
+
+kubeControllerManager:
+  enabled: false
+
+kubeScheduler:
+  enabled: false
+
+kubeProxy:
+  enabled: false
+
+prometheus:
+  prometheusSpec:
+    externalLabels:
+      cluster: example-eks-cluster
+      environment: dev
+      cloud: aws
+      region: ap-northeast-2
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp3
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 50Gi
+
+alertmanager:
+  alertmanagerSpec:
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp3
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 5Gi

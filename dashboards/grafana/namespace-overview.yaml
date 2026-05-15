@@ -1,0 +1,91 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-namespace-overview
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+  annotations:
+    grafana_folder: Kubernetes
+data:
+  namespace-overview.json: |
+    {
+      "title": "Namespace Overview",
+      "uid": "namespace-overview",
+      "schemaVersion": 36,
+      "version": 1,
+      "refresh": "30s",
+      "time": { "from": "now-1h", "to": "now" },
+      "templating": {
+        "list": [
+          {
+            "name": "namespace",
+            "type": "query",
+            "query": "label_values(kube_namespace_labels, namespace)",
+            "refresh": 2
+          }
+        ]
+      },
+      "panels": [
+        {
+          "id": 1,
+          "type": "timeseries",
+          "title": "CPU Usage",
+          "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+          "targets": [
+            {
+              "expr": "namespace:container_cpu_usage_seconds_total:sum_rate5m{namespace=~\"$namespace\"}",
+              "legendFormat": "{{namespace}}"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "type": "timeseries",
+          "title": "Memory Usage",
+          "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+          "targets": [
+            {
+              "expr": "namespace:container_memory_working_set_bytes:sum{namespace=~\"$namespace\"}",
+              "legendFormat": "{{namespace}}"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "type": "stat",
+          "title": "Running Pods",
+          "gridPos": { "x": 0, "y": 8, "w": 8, "h": 4 },
+          "targets": [
+            {
+              "expr": "count by (namespace) (kube_pod_status_phase{phase=\"Running\", namespace=~\"$namespace\"})",
+              "legendFormat": "{{namespace}}"
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "stat",
+          "title": "Pending Pods",
+          "gridPos": { "x": 8, "y": 8, "w": 8, "h": 4 },
+          "targets": [
+            {
+              "expr": "count by (namespace) (kube_pod_status_phase{phase=\"Pending\", namespace=~\"$namespace\"}) or vector(0)",
+              "legendFormat": "{{namespace}}"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "type": "stat",
+          "title": "Failed Pods",
+          "gridPos": { "x": 16, "y": 8, "w": 8, "h": 4 },
+          "targets": [
+            {
+              "expr": "count by (namespace) (kube_pod_status_phase{phase=\"Failed\", namespace=~\"$namespace\"}) or vector(0)",
+              "legendFormat": "{{namespace}}"
+            }
+          ]
+        }
+      ]
+    }

@@ -1,0 +1,29 @@
+# Fictional single-cluster override. Replace all values in an implementation repository.
+# This layer sits on top of: common → profile → env → sizing.
+
+prometheus:
+  prometheusSpec:
+    externalLabels:
+      cluster: example-single-cluster
+      environment: dev
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: standard
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 50Gi
+
+alertmanager:
+  alertmanagerSpec:
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: standard
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 5Gi
