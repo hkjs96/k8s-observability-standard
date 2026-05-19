@@ -18,16 +18,40 @@ foreach ($dir in $ruleDirs) {
   }
 }
 
-$promtool = Get-Command promtool -ErrorAction SilentlyContinue
-if ($promtool) {
+$promtoolPath = $null
+$localCandidates = @(
+  ".tmp\tools\promtool.exe",
+  "..\lgtm-k8s-observability-v2\tools\bin\promtool.exe"
+)
+foreach ($candidate in $localCandidates) {
+  if (Test-Path $candidate) {
+    $promtoolPath = (Resolve-Path $candidate).Path
+    break
+  }
+}
+if (-not $promtoolPath) {
+  $expanded = Get-ChildItem -Path ".tmp\tools" -Recurse -Filter "promtool.exe" -File -ErrorAction SilentlyContinue |
+    Select-Object -First 1
+  if ($expanded) {
+    $promtoolPath = $expanded.FullName
+  }
+}
+if (-not $promtoolPath) {
+  $promtool = Get-Command promtool -ErrorAction SilentlyContinue
+  if ($promtool) {
+    $promtoolPath = $promtool.Source
+  }
+}
+
+if ($promtoolPath) {
   $mirrors = Get-ChildItem -Path "rules" -Recurse -Filter "*.promtool.yaml" -File
   if ($mirrors) {
-    & $promtool.Source check rules @($mirrors.FullName)
+    & $promtoolPath check rules @($mirrors.FullName)
     if ($LASTEXITCODE -ne 0) {
       exit $LASTEXITCODE
     }
   }
-  Write-Host "promtool ok"
+  Write-Host "promtool ok: $promtoolPath"
 } else {
   Write-Host "promtool unavailable; skipped promtool check rules"
 }

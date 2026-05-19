@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"github.com/example/k8s-observability/internal/walk"
@@ -25,7 +26,7 @@ func PrometheusRules() error {
 		}
 	}
 
-	promtool, err := exec.LookPath("promtool")
+	promtool, err := findPromtool()
 	if err != nil {
 		fmt.Println("promtool unavailable; skipped promtool check rules")
 		fmt.Println("prometheus rules ok")
@@ -50,4 +51,29 @@ func PrometheusRules() error {
 	fmt.Printf("promtool checked %d files\n", len(mirrors))
 	fmt.Println("prometheus rules ok")
 	return nil
+}
+
+func findPromtool() (string, error) {
+	candidates := []string{
+		filepath.Join(".tmp", "tools", "promtool.exe"),
+		filepath.Join("..", "lgtm-k8s-observability-v2", "tools", "bin", "promtool.exe"),
+	}
+
+	matches, err := filepath.Glob(filepath.Join(".tmp", "tools", "prometheus-*", "promtool.exe"))
+	if err != nil {
+		return "", err
+	}
+	candidates = append(candidates, matches...)
+
+	for _, candidate := range candidates {
+		if _, err := os.Stat(candidate); err == nil {
+			return candidate, nil
+		}
+	}
+
+	if promtool, err := exec.LookPath("promtool"); err == nil {
+		return promtool, nil
+	}
+
+	return "", fmt.Errorf("promtool not found")
 }

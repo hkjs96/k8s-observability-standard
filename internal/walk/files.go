@@ -14,7 +14,7 @@ func Files(root string, keep func(string) bool) ([]string, error) {
 		}
 		clean := filepath.ToSlash(path)
 		if d.IsDir() {
-			if d.Name() == ".cache" || d.Name() == ".git" {
+			if d.Name() == ".cache" || d.Name() == ".git" || d.Name() == ".tmp" {
 				return filepath.SkipDir
 			}
 			return nil

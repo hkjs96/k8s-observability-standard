@@ -22,7 +22,7 @@ $patterns = @(
 )
 
 $combined = $patterns -join "|"
-$output = & rg -n --glob "!.cache/**" --glob "!README.md" --glob "!scripts/validate-sensitive-values.ps1" --glob "!internal/validate/sensitive.go" $combined . 2>$null
+$output = & rg -n --glob "!.cache/**" --glob "!.tmp/**" --glob "!README.md" --glob "!scripts/validate-sensitive-values.ps1" --glob "!internal/validate/sensitive.go" $combined . 2>$null
 if ($LASTEXITCODE -eq 0) {
   Write-Error "Forbidden sensitive or implementation-specific pattern found:`n$output"
   exit 1
@@ -32,7 +32,7 @@ if ($LASTEXITCODE -gt 1) {
   exit 1
 }
 
-$customerMentions = & rg -n --glob "!.cache/**" --glob "!scripts/validate-sensitive-values.ps1" --glob "!internal/validate/sensitive.go" "customers/" . 2>$null
+$customerMentions = & rg -n --glob "!.cache/**" --glob "!.tmp/**" --glob "!scripts/validate-sensitive-values.ps1" --glob "!internal/validate/sensitive.go" "customers/" . 2>$null
 if ($LASTEXITCODE -eq 0) {
   $bad = $customerMentions | Where-Object {
     ($_ -notmatch "AGENTS\.md") -and
