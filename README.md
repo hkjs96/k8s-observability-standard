@@ -10,6 +10,10 @@ The first implementation covers Phase 0-2 of the v2 standard:
   templates, and examples
 - Basic profile based on `kube-prometheus-stack`
 
+Current status: Phase 0-2 Basic baseline is validation-ready. See
+`docs/08-phase-0-2-completion.md` for completed outputs, validation evidence,
+and known limits.
+
 ## Repository Model
 
 Use this repository for common standards, sample values, validation commands,
@@ -86,8 +90,8 @@ helm template kube-prometheus-stack prometheus-community/kube-prometheus-stack `
   -f values/sizing/small.yaml |
   kubeconform -strict -ignore-missing-schemas
 
-# Validate Prometheus rules after installing promtool.
-promtool check rules rules/prometheus/*.yaml rules/alerting/*.yaml
+# Validate Prometheus rule mirrors after installing promtool.
+promtool check rules rules/prometheus/*.promtool.yaml rules/alerting/*.promtool.yaml
 ```
 
 ## Sensitive Value Check
