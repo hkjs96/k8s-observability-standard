@@ -9,6 +9,12 @@ The portable validation contract is:
 go run ./cmd/obsctl validate
 ```
 
+Full validation expects Go and Python. Helm and promtool should be available in
+CI when render and rule checks must be enforced. If promtool is not on `PATH`,
+the validator also checks local tool paths such as `.tmp/tools/promtool.exe` and
+expanded `.tmp/tools/prometheus-*/promtool.exe` archives. Local work directories
+`.git/`, `.cache/`, and `.tmp/` are ignored by repository scans.
+
 For local Windows environments without Go, the fallback wrapper is:
 
 ```powershell
@@ -24,6 +30,7 @@ GitOps consumption:
 - Basic profile values render with the pinned Helm chart when Helm is available.
 - Argo CD templates avoid unsafe project and wildcard patterns.
 - Prometheus rule samples have promtool mirror files.
+- Prometheus rule mirrors pass `promtool check rules` when promtool is available.
 - Sensitive or implementation-specific values are not committed.
 
 ## CI And Argo CD Boundary
