@@ -11,6 +11,11 @@ implementation repository:
 - `gitlab-ci-validate.yml`
 - `jenkinsfile-validate`
 
+Shared installers:
+
+- `scripts/install-validation-tools.ps1` for Windows CI runners.
+- `scripts/install-validation-tools.sh` for Linux CI runners.
+
 The CI job should validate, not deploy. Argo CD remains responsible for syncing
 merged Git state to clusters.
 

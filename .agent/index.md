@@ -28,7 +28,11 @@ required `.agent/` files are read.
 | `rules/**` | `.agent/workflows/add-prometheus-rule.md`, `.agent/checks/prometheus-rule-validation.md` |
 | `dashboards/**` | `.agent/workflows/add-dashboard.md`, `.agent/checks/sensitive-values.md` |
 | `policies/**` | `.agent/rules/repository-boundary.md`, `.agent/checks/basic-validation.md` |
+| `docs/10-phase-3-plan.md` | `.agent/workflows/phase-3-profile-planning.md`, `.agent/checks/phase-3-profile-validation.md` |
+| `docs/09-implementation-adoption.md`, `templates/implementation-adoption-checklist.template.md` | `.agent/workflows/implementation-adoption.md`, `.agent/checks/implementation-adoption-validation.md` |
+| Phase 3 profile values, rules, dashboards, or policies | `.agent/workflows/phase-3-profile-planning.md`, `.agent/checks/phase-3-profile-validation.md` |
 | `docs/**` | Use `.agent/rules/repository-boundary.md`; keep docs human-facing. |
+| `templates/**` | `.agent/workflows/implementation-adoption.md`, `.agent/checks/implementation-adoption-validation.md` |
 | `.agent/**` | Keep front matter accurate and update this index if routing changes. |
 | `scripts/**` | Ensure checks remain idempotent and safe for local execution. |
 

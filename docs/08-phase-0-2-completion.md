@@ -65,4 +65,5 @@ inputs are supplied outside this repository:
 ## Recommended Next Work
 
 1. Validate the first implementation repository adoption against this standard.
-2. Turn the Phase 3 plan into scoped logs, tracing, and SLO implementation tasks.
+2. Implement profile-scoped `obsctl validate` targets from the validation roadmap.
+3. Execute the Phase 3 task breakdown for logs, tracing, and SLO profiles.
