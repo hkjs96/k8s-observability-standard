@@ -13,3 +13,7 @@ implementation repository:
 
 The CI job should validate, not deploy. Argo CD remains responsible for syncing
 merged Git state to clusters.
+
+The templates call `scripts/install-validation-tools.*` before strict
+validation. Adapt those scripts if an implementation CI environment already
+preinstalls Helm, kubeconform, promtool, or PyYAML.

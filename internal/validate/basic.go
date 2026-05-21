@@ -83,6 +83,14 @@ func findHelm() (string, error) {
 	if helm, err := exec.LookPath("helm"); err == nil {
 		return helm, nil
 	}
+	localTmp := filepath.Join(".tmp", "tools", "helm")
+	if _, err := os.Stat(localTmp); err == nil {
+		return localTmp, nil
+	}
+	localTmpExe := filepath.Join(".tmp", "tools", "helm.exe")
+	if _, err := os.Stat(localTmpExe); err == nil {
+		return localTmpExe, nil
+	}
 	local := filepath.Join("..", "lgtm-k8s-observability-v2", "tools", "bin", "helm.exe")
 	if _, err := os.Stat(local); err == nil {
 		return local, nil

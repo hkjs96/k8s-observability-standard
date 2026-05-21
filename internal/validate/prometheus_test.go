@@ -22,6 +22,21 @@ func TestFindPromtoolUsesLocalTmpTool(t *testing.T) {
 	})
 }
 
+func TestFindPromtoolUsesLocalLinuxTmpTool(t *testing.T) {
+	withWorkDir(t, func(root string) {
+		want := filepath.Join(".tmp", "tools", "promtool")
+		writeFile(t, root, want, "fake promtool")
+
+		got, err := findPromtool()
+		if err != nil {
+			t.Fatalf("findPromtool() error = %v", err)
+		}
+		if got != want {
+			t.Fatalf("findPromtool() = %q, want %q", got, want)
+		}
+	})
+}
+
 func TestFindPromtoolUsesExpandedPrometheusArchive(t *testing.T) {
 	withWorkDir(t, func(root string) {
 		want := filepath.Join(".tmp", "tools", "prometheus-3.4.0.windows-amd64", "promtool.exe")

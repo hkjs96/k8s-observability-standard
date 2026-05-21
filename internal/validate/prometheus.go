@@ -59,6 +59,7 @@ func PrometheusRules(opts Options) error {
 func findPromtool() (string, error) {
 	candidates := []string{
 		filepath.Join(".tmp", "tools", "promtool.exe"),
+		filepath.Join(".tmp", "tools", "promtool"),
 		filepath.Join("..", "lgtm-k8s-observability-v2", "tools", "bin", "promtool.exe"),
 	}
 
