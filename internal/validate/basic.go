@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -28,8 +29,19 @@ func Basic(opts Options) error {
 		"-f", "values/env/dev.yaml",
 		"-f", "values/sizing/small.yaml",
 	}
-	if out, err := exec.Command(helm, templateArgs...).CombinedOutput(); err != nil {
-		return fmt.Errorf("helm template failed: %w\n%s", err, string(out))
+	rendered, err := exec.Command(helm, templateArgs...).CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("helm template failed: %w\n%s", err, string(rendered))
+	}
+
+	kubeconform, err := findKubeconform()
+	if err != nil {
+		if opts.StrictTools {
+			return err
+		}
+		fmt.Println("kubeconform unavailable; skipped rendered manifest validation")
+	} else if err := runKubeconform(kubeconform, rendered); err != nil {
+		return err
 	}
 
 	lintDir := filepath.Join(".cache", fmt.Sprintf("helm-lint-go-%d", time.Now().UnixNano()))
@@ -76,4 +88,37 @@ func findHelm() (string, error) {
 		return local, nil
 	}
 	return "", fmt.Errorf("helm not found")
+}
+
+func findKubeconform() (string, error) {
+	candidates := []string{
+		filepath.Join(".tmp", "tools", "kubeconform.exe"),
+		filepath.Join(".tmp", "tools", "kubeconform"),
+		filepath.Join("..", "lgtm-k8s-observability-v2", "tools", "bin", "kubeconform.exe"),
+	}
+
+	for _, candidate := range candidates {
+		if _, err := os.Stat(candidate); err == nil {
+			return candidate, nil
+		}
+	}
+
+	if kubeconform, err := exec.LookPath("kubeconform"); err == nil {
+		return kubeconform, nil
+	}
+
+	return "", fmt.Errorf("kubeconform not found")
+}
+
+func runKubeconform(kubeconform string, rendered []byte) error {
+	cmd := exec.Command(kubeconform, "-strict", "-ignore-missing-schemas", "-summary")
+	cmd.Stdin = strings.NewReader(string(rendered))
+	out, err := cmd.CombinedOutput()
+	if len(out) > 0 {
+		fmt.Print(string(out))
+	}
+	if err != nil {
+		return fmt.Errorf("kubeconform failed: %w", err)
+	}
+	return nil
 }

@@ -36,6 +36,7 @@ Observed result:
 - Go tests passed for validation and file walking packages.
 - YAML parse check passed.
 - Helm template and lint passed for chart version `85.0.2`.
+- Rendered manifest validation passed with kubeconform.
 - Argo CD template checks passed.
 - `promtool check rules` passed for 2 mirror files with 5 total rules.
 - Sensitive value scan passed.
@@ -58,12 +59,11 @@ inputs are supplied outside this repository:
   are documented as later profile work, not implemented here.
 - CI templates are portable examples. Each implementation may need provider
   specific cache, network, and tool installation adjustments.
-- `kubeconform` is documented as an optional rendered manifest check, but it is
-  not part of the default `obsctl validate` path.
+- `kubeconform` uses `-ignore-missing-schemas` because some CRDs do not have
+  schemas available in the default schema catalog.
 
 ## Recommended Next Work
 
-1. Add rendered manifest validation with kubeconform or an equivalent validator.
-2. Add implementation repository examples that consume this standard without
+1. Add implementation repository examples that consume this standard without
    adding runtime-specific values here.
-3. Add Phase 3 planning for logs, tracing, and SLO profiles.
+2. Add Phase 3 planning for logs, tracing, and SLO profiles.

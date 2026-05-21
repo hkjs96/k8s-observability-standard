@@ -15,11 +15,12 @@ CI jobs that install all validation tools should use strict mode:
 go run ./cmd/obsctl validate --strict-tools
 ```
 
-Full validation expects Go and Python. Helm and promtool should be available in
-CI when render and rule checks must be enforced. If promtool is not on `PATH`,
-the validator also checks local tool paths such as `.tmp/tools/promtool.exe` and
-expanded `.tmp/tools/prometheus-*/promtool.exe` archives. Local work directories
-`.git/`, `.cache/`, and `.tmp/` are ignored by repository scans.
+Full validation expects Go, Python with PyYAML, Helm, kubeconform, and promtool.
+If kubeconform or promtool are not on `PATH`, the validator also checks local
+tool paths such as `.tmp/tools/kubeconform.exe`, `.tmp/tools/kubeconform`,
+`.tmp/tools/promtool.exe`, and expanded `.tmp/tools/prometheus-*/promtool.exe`
+archives. Local work directories `.git/`, `.cache/`, and `.tmp/` are ignored by
+repository scans.
 
 For local Windows environments without Go, the fallback wrapper is:
 

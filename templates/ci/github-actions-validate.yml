@@ -30,6 +30,18 @@ jobs:
       - name: Install Helm
         uses: azure/setup-helm@v4
 
+      - name: Install kubeconform
+        shell: pwsh
+        run: |
+          $version = "0.6.7"
+          $tools = ".tmp/tools"
+          New-Item -ItemType Directory -Force -Path $tools | Out-Null
+          $zip = Join-Path $tools "kubeconform.zip"
+          Invoke-WebRequest `
+            -Uri "https://github.com/yannh/kubeconform/releases/download/v$version/kubeconform-windows-amd64.zip" `
+            -OutFile $zip
+          Expand-Archive -Path $zip -DestinationPath $tools -Force
+
       - name: Install promtool
         shell: pwsh
         run: |

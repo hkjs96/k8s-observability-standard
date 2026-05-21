@@ -16,14 +16,40 @@ if (-not $helm) {
   $helmPath = $helm.Source
 }
 
-& $helmPath template kube-prometheus-stack kube-prometheus-stack `
+$rendered = & $helmPath template kube-prometheus-stack kube-prometheus-stack `
   --repo https://prometheus-community.github.io/helm-charts `
   --version 85.0.2 `
   --namespace monitoring `
   -f values\common\kube-prometheus-stack.yaml `
   -f values\profiles\basic.yaml `
   -f values\env\dev.yaml `
-  -f values\sizing\small.yaml | Out-Null
+  -f values\sizing\small.yaml
+
+$kubeconformPath = $null
+$kubeconformCandidates = @(
+  ".tmp\tools\kubeconform.exe",
+  "..\lgtm-k8s-observability-v2\tools\bin\kubeconform.exe"
+)
+foreach ($candidate in $kubeconformCandidates) {
+  if (Test-Path $candidate) {
+    $kubeconformPath = (Resolve-Path $candidate).Path
+    break
+  }
+}
+if (-not $kubeconformPath) {
+  $kubeconform = Get-Command kubeconform -ErrorAction SilentlyContinue
+  if ($kubeconform) {
+    $kubeconformPath = $kubeconform.Source
+  }
+}
+if ($kubeconformPath) {
+  $rendered | & $kubeconformPath -strict -ignore-missing-schemas -summary
+  if ($LASTEXITCODE -ne 0) {
+    exit $LASTEXITCODE
+  }
+} else {
+  Write-Host "kubeconform unavailable; skipped rendered manifest validation"
+}
 
 $lintDir = Join-Path (Get-Location) (".cache\helm-lint-" + [guid]::NewGuid().ToString("N"))
 New-Item -ItemType Directory -Force -Path $lintDir | Out-Null
