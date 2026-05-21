@@ -64,6 +64,5 @@ inputs are supplied outside this repository:
 
 ## Recommended Next Work
 
-1. Add implementation repository examples that consume this standard without
-   adding runtime-specific values here.
-2. Add Phase 3 planning for logs, tracing, and SLO profiles.
+1. Validate the first implementation repository adoption against this standard.
+2. Turn the Phase 3 plan into scoped logs, tracing, and SLO implementation tasks.

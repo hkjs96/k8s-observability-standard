@@ -26,3 +26,5 @@ Agent rules, workflows, checks, and path routing live in `.agent/`.
 - `06-day2-operations.md`: routine checks and operating assumptions
 - `07-validation-contract.md`: portable validation commands and CI contract
 - `08-phase-0-2-completion.md`: completed outputs, validation evidence, and known limits
+- `09-implementation-adoption.md`: implementation repository adoption guide
+- `10-phase-3-plan.md`: logs, tracing, and SLO planning
