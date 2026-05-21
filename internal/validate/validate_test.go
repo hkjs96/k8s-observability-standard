@@ -7,7 +7,7 @@ import (
 )
 
 func TestSelectChecksAllTargets(t *testing.T) {
-	checks, err := selectChecks("")
+	checks, err := selectChecks("", Options{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -24,7 +24,7 @@ func TestSelectChecksAllTargets(t *testing.T) {
 }
 
 func TestSelectChecksSingleTarget(t *testing.T) {
-	checks, err := selectChecks("prometheus")
+	checks, err := selectChecks("prometheus", Options{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -34,7 +34,7 @@ func TestSelectChecksSingleTarget(t *testing.T) {
 }
 
 func TestSelectChecksRejectsUnknownTarget(t *testing.T) {
-	_, err := selectChecks("unknown")
+	_, err := selectChecks("unknown", Options{})
 	if err == nil {
 		t.Fatal("selectChecks() error = nil, want unknown target error")
 	}

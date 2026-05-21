@@ -21,11 +21,11 @@ func run(args []string) error {
 
 	switch args[0] {
 	case "validate":
-		target := "all"
-		if len(args) > 1 {
-			target = args[1]
+		target, opts, err := parseValidateArgs(args[1:])
+		if err != nil {
+			return err
 		}
-		return validate.Run(target)
+		return validate.Run(target, opts)
 	case "help", "-h", "--help":
 		return usage()
 	default:
@@ -33,13 +33,32 @@ func run(args []string) error {
 	}
 }
 
+func parseValidateArgs(args []string) (string, validate.Options, error) {
+	target := "all"
+	var opts validate.Options
+	for _, arg := range args {
+		switch arg {
+		case "--strict-tools":
+			opts.StrictTools = true
+		case "all", "basic", "yaml", "sensitive", "argocd", "prometheus":
+			target = arg
+		default:
+			return "", opts, fmt.Errorf("unknown validate argument %q", arg)
+		}
+	}
+	return target, opts, nil
+}
+
 func usage() error {
 	fmt.Println(`obsctl validates the Kubernetes observability standard repository.
 
 Usage:
-  obsctl validate [all|basic|yaml|sensitive|argocd|prometheus]
+  obsctl validate [--strict-tools] [all|basic|yaml|sensitive|argocd|prometheus]
 
 Default:
-  obsctl validate all`)
+  obsctl validate all
+
+Options:
+  --strict-tools  fail when optional validation tools are unavailable`)
 	return nil
 }

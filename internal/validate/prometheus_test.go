@@ -41,7 +41,7 @@ func TestPrometheusRulesRequiresPromtoolMirror(t *testing.T) {
 	withWorkDir(t, func(root string) {
 		writeFile(t, root, "rules/alerting/basic-alerts.yaml", "apiVersion: monitoring.coreos.com/v1\n")
 
-		err := PrometheusRules()
+		err := PrometheusRules(Options{})
 		if err == nil {
 			t.Fatal("PrometheusRules() error = nil, want missing mirror error")
 		}
@@ -57,7 +57,7 @@ func TestPrometheusRulesAllowsEmptyRulesDirectory(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if err := PrometheusRules(); err != nil {
+		if err := PrometheusRules(Options{}); err != nil {
 			t.Fatalf("PrometheusRules() error = %v", err)
 		}
 	})

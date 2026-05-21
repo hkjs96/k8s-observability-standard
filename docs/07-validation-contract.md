@@ -9,6 +9,12 @@ The portable validation contract is:
 go run ./cmd/obsctl validate
 ```
 
+CI jobs that install all validation tools should use strict mode:
+
+```bash
+go run ./cmd/obsctl validate --strict-tools
+```
+
 Full validation expects Go and Python. Helm and promtool should be available in
 CI when render and rule checks must be enforced. If promtool is not on `PATH`,
 the validator also checks local tool paths such as `.tmp/tools/promtool.exe` and

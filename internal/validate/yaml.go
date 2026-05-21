@@ -9,7 +9,7 @@ import (
 	"github.com/example/k8s-observability/internal/walk"
 )
 
-func YAML() error {
+func YAML(opts Options) error {
 	files, err := walk.Files(".", func(path string) bool {
 		return strings.HasSuffix(path, ".yaml") || strings.HasSuffix(path, ".yml")
 	})
@@ -22,6 +22,9 @@ func YAML() error {
 
 	python, err := exec.LookPath("python")
 	if err != nil {
+		if opts.StrictTools {
+			return err
+		}
 		fmt.Println("python unavailable; skipped YAML parser check")
 		return nil
 	}
@@ -38,6 +41,9 @@ import sys
 try:
     import yaml
 except Exception as exc:
+    if json.loads(sys.argv[2]):
+        print(f"PyYAML unavailable: {exc}", file=sys.stderr)
+        sys.exit(2)
     print(f"PyYAML unavailable; skipped YAML parser check: {exc}")
     sys.exit(0)
 errors = []
@@ -53,7 +59,12 @@ if errors:
 print("yaml ok")
 `
 
-	out, err := exec.Command(python, "-c", code, string(payload)).CombinedOutput()
+	strictPayload, err := json.Marshal(opts.StrictTools)
+	if err != nil {
+		return err
+	}
+
+	out, err := exec.Command(python, "-c", code, string(payload), string(strictPayload)).CombinedOutput()
 	if len(out) > 0 {
 		fmt.Print(string(out))
 	}

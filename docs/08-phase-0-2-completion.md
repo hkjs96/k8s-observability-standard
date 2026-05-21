@@ -63,9 +63,7 @@ inputs are supplied outside this repository:
 
 ## Recommended Next Work
 
-1. Add a strict tool mode to `obsctl validate` so CI can fail when Helm or
-   promtool is unavailable.
-2. Add rendered manifest validation with kubeconform or an equivalent validator.
-3. Add implementation repository examples that consume this standard without
+1. Add rendered manifest validation with kubeconform or an equivalent validator.
+2. Add implementation repository examples that consume this standard without
    adding runtime-specific values here.
-4. Add Phase 3 planning for logs, tracing, and SLO profiles.
+3. Add Phase 3 planning for logs, tracing, and SLO profiles.

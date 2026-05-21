@@ -14,7 +14,7 @@ func TestYAMLRejectsInvalidYAML(t *testing.T) {
 	withWorkDir(t, func(root string) {
 		writeFile(t, root, "values/bad.yaml", "key: [unterminated\n")
 
-		err := YAML()
+		err := YAML(Options{})
 		if err == nil {
 			t.Fatal("YAML() error = nil, want parse error")
 		}
@@ -28,7 +28,7 @@ func TestYAMLAllowsValidYAML(t *testing.T) {
 	withWorkDir(t, func(root string) {
 		writeFile(t, root, "values/good.yaml", "key: value\n")
 
-		if err := YAML(); err != nil {
+		if err := YAML(Options{}); err != nil {
 			t.Fatalf("YAML() error = %v", err)
 		}
 	})

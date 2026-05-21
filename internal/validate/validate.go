@@ -9,8 +9,12 @@ type Check struct {
 	Fn   func() error
 }
 
-func Run(target string) error {
-	checks, err := selectChecks(target)
+type Options struct {
+	StrictTools bool
+}
+
+func Run(target string, opts Options) error {
+	checks, err := selectChecks(target, opts)
 	if err != nil {
 		return err
 	}
@@ -26,12 +30,12 @@ func Run(target string) error {
 	return nil
 }
 
-func selectChecks(target string) ([]Check, error) {
+func selectChecks(target string, opts Options) ([]Check, error) {
 	all := []Check{
-		{Name: "yaml", Fn: YAML},
-		{Name: "basic", Fn: Basic},
+		{Name: "yaml", Fn: func() error { return YAML(opts) }},
+		{Name: "basic", Fn: func() error { return Basic(opts) }},
 		{Name: "argocd", Fn: ArgoCD},
-		{Name: "prometheus", Fn: PrometheusRules},
+		{Name: "prometheus", Fn: func() error { return PrometheusRules(opts) }},
 		{Name: "sensitive", Fn: SensitiveValues},
 	}
 

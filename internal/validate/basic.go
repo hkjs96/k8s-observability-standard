@@ -8,9 +8,12 @@ import (
 	"time"
 )
 
-func Basic() error {
+func Basic(opts Options) error {
 	helm, err := findHelm()
 	if err != nil {
+		if opts.StrictTools {
+			return err
+		}
 		fmt.Println("helm unavailable; skipped helm template and helm lint")
 		return nil
 	}

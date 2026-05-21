@@ -10,7 +10,7 @@ import (
 	"github.com/example/k8s-observability/internal/walk"
 )
 
-func PrometheusRules() error {
+func PrometheusRules(opts Options) error {
 	files, err := walk.Files("rules", func(path string) bool {
 		return strings.HasSuffix(path, ".yaml") && !strings.HasSuffix(path, ".promtool.yaml")
 	})
@@ -28,6 +28,9 @@ func PrometheusRules() error {
 
 	promtool, err := findPromtool()
 	if err != nil {
+		if opts.StrictTools {
+			return err
+		}
 		fmt.Println("promtool unavailable; skipped promtool check rules")
 		fmt.Println("prometheus rules ok")
 		return nil
