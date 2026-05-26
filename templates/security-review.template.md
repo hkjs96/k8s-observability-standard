@@ -23,6 +23,14 @@
 - Egress requirements:
 - HostPath exceptions:
 
+## Disposable Smoke Test Access
+
+- SSH ingress limited to operator source:
+- Kubernetes API ingress limited or tunneled:
+- Grafana and Prometheus public exposure avoided:
+- Temporary kubeconfig handling reviewed:
+- Temporary ingress cleanup owner:
+
 ## Approval
 
 - Reviewer:

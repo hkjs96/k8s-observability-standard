@@ -8,6 +8,7 @@
 - Pod count:
 - Primary workloads:
 - Environment split:
+- Disposable smoke-test environment available:
 
 ## Metrics
 
@@ -22,6 +23,7 @@
 ## Basic Profile Decision
 
 - Fit for Basic:
+- Disposable EC2 k3s smoke test required:
 - Required overrides:
 - Security exceptions:
 - Open questions:

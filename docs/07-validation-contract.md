@@ -15,6 +15,10 @@ CI jobs that install all validation tools should use strict mode:
 go run ./cmd/obsctl validate --strict-tools
 ```
 
+Strict validation may contact upstream chart repositories when Helm refreshes
+repository metadata. CI runners should provide approved network egress or a
+pre-populated Helm cache that matches the pinned chart versions.
+
 Full validation expects Go, Python with PyYAML, Helm, kubeconform, and promtool.
 If kubeconform or promtool are not on `PATH`, the validator also checks local
 tool paths such as `.tmp/tools/kubeconform.exe`, `.tmp/tools/kubeconform`,

@@ -41,6 +41,10 @@ CRDs and CRs must not be forced into the same lifecycle without an upgrade plan.
 
 ## Basic Smoke Tests
 
+For a disposable Amazon Linux 2023 k3s runtime check, use
+`docs/13-ec2-k3s-basic-smoke-runbook.md` and capture results with
+`templates/basic-smoke-evidence.template.md`.
+
 - Grafana datasource health succeeds.
 - Prometheus targets are up.
 - Alertmanager is reachable from Prometheus.

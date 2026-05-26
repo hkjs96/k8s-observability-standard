@@ -27,6 +27,9 @@ Do not commit those values here.
 
 ## Suggested Flow
 
+For the full evidence flow, use
+`docs/13-ec2-k3s-basic-smoke-runbook.md`.
+
 1. Launch one Amazon Linux 2023 EC2 instance with the cloud-init from
    `cloud-init.yaml`.
 2. SSH to the instance and wait for k3s:
@@ -74,3 +77,6 @@ powershell -ExecutionPolicy Bypass -File scripts\run-k3s-basic-smoke.ps1 -Kubeco
 
 Use the implementation-owned infrastructure tool to terminate the EC2 instance.
 This repository does not own the EC2 lifecycle.
+
+Also remove temporary security group ingress rules and delete any kubeconfig
+copy that contains a real instance address.

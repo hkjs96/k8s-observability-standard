@@ -44,6 +44,7 @@ sync. Keep real runtime values outside this standard repository.
 
 ## Smoke Test
 
+- Smoke evidence captured with `templates/basic-smoke-evidence.template.md`:
 - Prometheus target health checked:
 - kube-state-metrics data visible:
 - node-exporter data visible:

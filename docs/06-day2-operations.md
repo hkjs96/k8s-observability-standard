@@ -32,5 +32,6 @@ Each implementation repo should maintain:
 - dashboard entry points
 - alert route map
 - smoke test commands
+- latest smoke-test evidence location
 - rollback procedure for values changes
 - known limits and sizing assumptions

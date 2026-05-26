@@ -18,6 +18,7 @@
 
 ## Smoke Tests
 
+- Smoke evidence template copied to the implementation repository.
 - Prometheus pods ready.
 - Alertmanager pods ready.
 - Grafana pods ready.

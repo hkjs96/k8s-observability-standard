@@ -13,6 +13,15 @@
 - Alertmanager access method:
 - Dashboard folder:
 
+## Validation And Evidence
+
+- Standard repository revision:
+- Chart version:
+- Values layer list:
+- Static validation evidence:
+- Latest smoke evidence:
+- Rollback commit or version:
+
 ## Routine Operations
 
 - Target health check:

@@ -14,6 +14,13 @@ Current status: Phase 0-2 Basic baseline is validation-ready. See
 `docs/08-phase-0-2-completion.md` for completed outputs, validation evidence,
 and known limits.
 
+For a disposable Basic profile runtime check, use the Amazon Linux 2023 k3s
+smoke-test material:
+
+- `docs/13-ec2-k3s-basic-smoke-runbook.md`
+- `examples/ec2-k3s-basic/`
+- `templates/basic-smoke-evidence.template.md`
+
 ## Repository Model
 
 Use this repository for common standards, sample values, validation commands,
@@ -36,7 +43,7 @@ ARNs, credentials, or customer-specific cluster identifiers here.
 - `rules/`: Prometheus recording and alerting rules
 - `policies/`: security guardrail samples
 - `templates/`: assessment, security review, deployment, and handover templates
-- `examples/`: fictional example overlays only
+- `examples/`: fictional example overlays and disposable smoke-test examples
 - `cmd/obsctl`: provider-neutral validation CLI
 - `scripts/validate-all.ps1`: fallback wrapper for environments without Go
 

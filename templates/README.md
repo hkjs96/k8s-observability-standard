@@ -7,6 +7,7 @@ values.
 ## Index
 
 - `assessment-sheet.template.md`: initial observability assessment.
+- `basic-smoke-evidence.template.md`: evidence capture for disposable Basic profile smoke tests.
 - `deployment-checklist.template.md`: Basic profile deployment checklist.
 - `implementation-adoption-checklist.template.md`: implementation repository adoption checklist.
 - `operation-handover.template.md`: operations handover skeleton.

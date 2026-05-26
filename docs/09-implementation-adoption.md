@@ -80,9 +80,11 @@ Before handover, capture:
 - chart version
 - values layer list
 - validation command output
+- Basic smoke evidence, when a disposable cluster test was run
 - Grafana access method
 - alert receiver owner
 - storage and retention assumptions
 - rollback method
 
-Use `templates/operation-handover.template.md` as the handover skeleton.
+Use `templates/basic-smoke-evidence.template.md` for smoke-test evidence and
+`templates/operation-handover.template.md` as the handover skeleton.
