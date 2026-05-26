@@ -1,0 +1,9 @@
+#cloud-config
+package_update: true
+packages:
+  - curl
+  - ca-certificates
+  - unzip
+runcmd:
+  - curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--write-kubeconfig-mode=644 --disable=traefik" sh -
+  - /usr/local/bin/kubectl get nodes
