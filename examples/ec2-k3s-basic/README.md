@@ -30,8 +30,20 @@ Do not commit those values here.
 For the full evidence flow, use
 `docs/13-ec2-k3s-basic-smoke-runbook.md`.
 
-1. Launch one Amazon Linux 2023 EC2 instance with the cloud-init from
-   `cloud-init.yaml`.
+1. Launch one Amazon Linux 2023 EC2 instance with the helper script or with the
+   cloud-init from `cloud-init.yaml`. The helper supports `-WhatIf` and asks
+   for confirmation unless `-Force` is provided.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\new-ec2-k3s-smoke-instance.ps1 `
+  -Region REPLACE_WITH_REGION `
+  -AmiId REPLACE_WITH_AMI_ID `
+  -InstanceType REPLACE_WITH_INSTANCE_TYPE `
+  -KeyName REPLACE_WITH_KEY_PAIR_NAME `
+  -SubnetId REPLACE_WITH_SUBNET_ID `
+  -SecurityGroupId REPLACE_WITH_SECURITY_GROUP_ID
+```
+
 2. SSH to the instance and wait for k3s:
 
 ```bash
@@ -43,14 +55,18 @@ Amazon Linux 2023 note: the cloud-init disables `nm-cloud-setup` when present
 because it can interfere with Kubernetes CNI-managed routes on NetworkManager
 based images.
 
-3. Copy kubeconfig from the instance:
+3. Copy kubeconfig from the instance manually or with the helper script:
 
-```bash
-sudo cat /etc/rancher/k3s/k3s.yaml
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\get-k3s-kubeconfig.ps1 `
+  -HostName REPLACE_WITH_INSTANCE_ADDRESS `
+  -KeyPath REPLACE_WITH_KEY_PATH `
+  -OutputPath REPLACE_WITH_KUBECONFIG_PATH
 ```
 
 4. Replace the server address in the copied kubeconfig with the instance private
-   or temporary public address.
+   or temporary public address. The helper script does this automatically and
+   blocks repository-local kubeconfig output by default.
 5. From this repository, run validation:
 
 ```powershell
@@ -63,7 +79,14 @@ go run ./cmd/obsctl validate --strict-tools
 powershell -ExecutionPolicy Bypass -File scripts\run-k3s-basic-smoke.ps1 -Kubeconfig REPLACE_WITH_KUBECONFIG_PATH
 ```
 
-7. Destroy the EC2 instance when testing is complete.
+7. Destroy the EC2 instance when testing is complete. The cleanup helper also
+   supports `-WhatIf` and asks for confirmation unless `-Force` is provided.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\remove-ec2-k3s-smoke-instance.ps1 `
+  -Region REPLACE_WITH_REGION `
+  -InstanceId REPLACE_WITH_INSTANCE_ID
+```
 
 ## Expected Result
 

@@ -50,6 +50,20 @@ access. Do not expose Grafana or Prometheus directly for this smoke test.
 Launch one Amazon Linux 2023 instance with
 `examples/ec2-k3s-basic/cloud-init.yaml` as user data.
 
+The helper script wraps `aws ec2 run-instances` and keeps all runtime values as
+operator-provided parameters. It supports `-WhatIf` and asks for confirmation
+unless `-Force` is provided:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\new-ec2-k3s-smoke-instance.ps1 `
+  -Region REPLACE_WITH_REGION `
+  -AmiId REPLACE_WITH_AMI_ID `
+  -InstanceType REPLACE_WITH_INSTANCE_TYPE `
+  -KeyName REPLACE_WITH_KEY_PAIR_NAME `
+  -SubnetId REPLACE_WITH_SUBNET_ID `
+  -SecurityGroupId REPLACE_WITH_SECURITY_GROUP_ID
+```
+
 After cloud-init completes, verify k3s on the instance:
 
 ```bash
@@ -72,7 +86,17 @@ Copy kubeconfig from the instance:
 sudo cat /etc/rancher/k3s/k3s.yaml
 ```
 
+Or fetch it with the helper script:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\get-k3s-kubeconfig.ps1 `
+  -HostName REPLACE_WITH_INSTANCE_ADDRESS `
+  -KeyPath REPLACE_WITH_KEY_PATH `
+  -OutputPath REPLACE_WITH_KUBECONFIG_PATH
+```
+
 Store the copied file outside the repository if it contains a real endpoint.
+The helper blocks repository-local output by default.
 Replace the `server` value with either:
 
 - `https://127.0.0.1:6443` when using an SSH tunnel.
@@ -126,6 +150,15 @@ After evidence capture:
 3. Remove temporary security group ingress rules.
 4. Record validation status, chart version, and known limits in the
    implementation repository.
+
+The cleanup helper terminates the disposable instance. It supports `-WhatIf`
+and asks for confirmation unless `-Force` is provided.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\remove-ec2-k3s-smoke-instance.ps1 `
+  -Region REPLACE_WITH_REGION `
+  -InstanceId REPLACE_WITH_INSTANCE_ID
+```
 
 ## Failure Triage
 
