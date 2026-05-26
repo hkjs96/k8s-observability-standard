@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/example/k8s-observability/internal/smoke"
 	"github.com/example/k8s-observability/internal/validate"
 )
 
@@ -26,6 +27,8 @@ func run(args []string) error {
 			return err
 		}
 		return validate.Run(target, opts)
+	case "smoke":
+		return smoke.Run(args[1:])
 	case "help", "-h", "--help":
 		return usage()
 	default:
@@ -54,11 +57,15 @@ func usage() error {
 
 Usage:
   obsctl validate [--strict-tools] [all|basic|yaml|sensitive|argocd|prometheus]
+  obsctl smoke ec2-k3s [launch|fetch-kubeconfig|terminate] [options]
+  obsctl smoke k3s-basic install [options]
 
 Default:
   obsctl validate all
 
 Options:
-  --strict-tools  fail when optional validation tools are unavailable`)
+  --strict-tools  fail when optional validation tools are unavailable
+
+Run "obsctl smoke help" for disposable smoke helper usage.`)
 	return nil
 }

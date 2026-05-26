@@ -50,18 +50,20 @@ access. Do not expose Grafana or Prometheus directly for this smoke test.
 Launch one Amazon Linux 2023 instance with
 `examples/ec2-k3s-basic/cloud-init.yaml` as user data.
 
-The helper script wraps `aws ec2 run-instances` and keeps all runtime values as
-operator-provided parameters. It supports `-WhatIf` and asks for confirmation
-unless `-Force` is provided:
+The helper wraps `aws ec2 run-instances` and keeps all runtime values as
+operator-provided parameters. It is exposed through `obsctl` so the same command
+works on Windows, Linux, and macOS. Use `--dry-run` to inspect the AWS CLI call;
+use `--yes` for a real launch:
 
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\new-ec2-k3s-smoke-instance.ps1 `
-  -Region REPLACE_WITH_REGION `
-  -AmiId REPLACE_WITH_AMI_ID `
-  -InstanceType REPLACE_WITH_INSTANCE_TYPE `
-  -KeyName REPLACE_WITH_KEY_PAIR_NAME `
-  -SubnetId REPLACE_WITH_SUBNET_ID `
-  -SecurityGroupId REPLACE_WITH_SECURITY_GROUP_ID
+```bash
+go run ./cmd/obsctl smoke ec2-k3s launch \
+  --region REPLACE_WITH_REGION \
+  --ami-id REPLACE_WITH_AMI_ID \
+  --instance-type REPLACE_WITH_INSTANCE_TYPE \
+  --key-name REPLACE_WITH_KEY_PAIR_NAME \
+  --subnet-id REPLACE_WITH_SUBNET_ID \
+  --security-group-id REPLACE_WITH_SECURITY_GROUP_ID \
+  --dry-run
 ```
 
 After cloud-init completes, verify k3s on the instance:
@@ -86,13 +88,13 @@ Copy kubeconfig from the instance:
 sudo cat /etc/rancher/k3s/k3s.yaml
 ```
 
-Or fetch it with the helper script:
+Or fetch it with the helper:
 
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\get-k3s-kubeconfig.ps1 `
-  -HostName REPLACE_WITH_INSTANCE_ADDRESS `
-  -KeyPath REPLACE_WITH_KEY_PATH `
-  -OutputPath REPLACE_WITH_KUBECONFIG_PATH
+```bash
+go run ./cmd/obsctl smoke ec2-k3s fetch-kubeconfig \
+  --host REPLACE_WITH_INSTANCE_ADDRESS \
+  --key-path REPLACE_WITH_KEY_PATH \
+  --output REPLACE_WITH_KUBECONFIG_PATH
 ```
 
 Store the copied file outside the repository if it contains a real endpoint.
@@ -115,6 +117,12 @@ go run ./cmd/obsctl validate --strict-tools
 
 If tools are not installed locally, install them with the shared helper first:
 
+```bash
+sh scripts/install-validation-tools.sh
+```
+
+On Windows runners or workstations:
+
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts\install-validation-tools.ps1
 ```
@@ -123,8 +131,8 @@ powershell -ExecutionPolicy Bypass -File scripts\install-validation-tools.ps1
 
 Run the Basic smoke script against the temporary kubeconfig:
 
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\run-k3s-basic-smoke.ps1 -Kubeconfig REPLACE_WITH_KUBECONFIG_PATH
+```bash
+go run ./cmd/obsctl smoke k3s-basic install --kubeconfig REPLACE_WITH_KUBECONFIG_PATH
 ```
 
 Expected cluster evidence:
@@ -151,13 +159,14 @@ After evidence capture:
 4. Record validation status, chart version, and known limits in the
    implementation repository.
 
-The cleanup helper terminates the disposable instance. It supports `-WhatIf`
-and asks for confirmation unless `-Force` is provided.
+The cleanup helper terminates the disposable instance. Use `--dry-run` to
+inspect the AWS CLI call; use `--yes` for a real termination.
 
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\remove-ec2-k3s-smoke-instance.ps1 `
-  -Region REPLACE_WITH_REGION `
-  -InstanceId REPLACE_WITH_INSTANCE_ID
+```bash
+go run ./cmd/obsctl smoke ec2-k3s terminate \
+  --region REPLACE_WITH_REGION \
+  --instance-id REPLACE_WITH_INSTANCE_ID \
+  --dry-run
 ```
 
 ## Failure Triage
