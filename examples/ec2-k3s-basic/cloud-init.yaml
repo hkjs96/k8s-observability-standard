@@ -4,6 +4,24 @@ packages:
   - curl
   - ca-certificates
   - unzip
+  - iptables
+write_files:
+  - path: /etc/modules-load.d/k3s-smoke.conf
+    permissions: "0644"
+    content: |
+      overlay
+      br_netfilter
+  - path: /etc/sysctl.d/90-k3s-smoke.conf
+    permissions: "0644"
+    content: |
+      net.bridge.bridge-nf-call-iptables = 1
+      net.bridge.bridge-nf-call-ip6tables = 1
+      net.ipv4.ip_forward = 1
 runcmd:
-  - curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--write-kubeconfig-mode=644 --disable=traefik" sh -
-  - /usr/local/bin/kubectl get nodes
+  - modprobe overlay
+  - modprobe br_netfilter
+  - sysctl --system
+  - systemctl disable --now nm-cloud-setup.service nm-cloud-setup.timer || true
+  - curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --write-kubeconfig-mode=644 --disable=traefik --node-name=al2023-k3s-smoke" sh -
+  - /usr/local/bin/kubectl wait --for=condition=Ready node/al2023-k3s-smoke --timeout=300s
+  - /usr/local/bin/kubectl get nodes -o wide

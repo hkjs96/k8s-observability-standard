@@ -1,12 +1,12 @@
 # EC2 k3s Basic Smoke Example
 
 This example is a disposable smoke-test pattern for validating the Basic
-profile on a single EC2 instance running k3s. It is intentionally generic and
-does not include account-specific values.
+profile on a single Amazon Linux 2023 EC2 instance running k3s. It is
+intentionally generic and does not include account-specific values.
 
 ## What This Tests
 
-- k3s starts on one Linux EC2 instance.
+- k3s starts on one Amazon Linux 2023 EC2 instance.
 - Helm can render and install `kube-prometheus-stack`.
 - Grafana, Prometheus, Alertmanager, kube-state-metrics, and node-exporter pods start.
 - Repository validation remains green before deployment.
@@ -27,13 +27,18 @@ Do not commit those values here.
 
 ## Suggested Flow
 
-1. Launch one EC2 instance with the cloud-init from `cloud-init.yaml`.
+1. Launch one Amazon Linux 2023 EC2 instance with the cloud-init from
+   `cloud-init.yaml`.
 2. SSH to the instance and wait for k3s:
 
 ```bash
 sudo systemctl status k3s --no-pager
 sudo kubectl get nodes
 ```
+
+Amazon Linux 2023 note: the cloud-init disables `nm-cloud-setup` when present
+because it can interfere with Kubernetes CNI-managed routes on NetworkManager
+based images.
 
 3. Copy kubeconfig from the instance:
 
