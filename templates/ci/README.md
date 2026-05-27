@@ -11,14 +11,10 @@ implementation repository:
 - `gitlab-ci-validate.yml`
 - `jenkinsfile-validate`
 
-Shared installers:
-
-- `scripts/install-validation-tools.ps1` for Windows CI runners.
-- `scripts/install-validation-tools.sh` for Linux CI runners.
-
 The CI job should validate, not deploy. Argo CD remains responsible for syncing
 merged Git state to clusters.
 
-The templates call `scripts/install-validation-tools.*` before strict
-validation. Adapt those scripts if an implementation CI environment already
-preinstalls Helm, kubeconform, promtool, or PyYAML.
+Strict validation requires Helm, kubeconform, promtool, and PyYAML. The
+templates install those tools inline before running the Go validator. Adapt the
+tool-install steps if an implementation CI environment already preinstalls
+them.

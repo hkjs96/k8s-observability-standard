@@ -1,0 +1,37 @@
+# Logs profile overlay for grafana/loki.
+# Keep object storage, tenant, and endpoint values in implementation repositories.
+
+deploymentMode: SingleBinary
+
+commonLabels:
+  observability.standard/component: logs
+  observability.standard/profile: logs
+
+loki:
+  auth_enabled: false
+  useTestSchema: true
+  commonConfig:
+    replication_factor: 1
+  storage:
+    type: filesystem
+
+singleBinary:
+  replicas: 1
+
+read:
+  replicas: 0
+
+write:
+  replicas: 0
+
+backend:
+  replicas: 0
+
+chunksCache:
+  enabled: false
+
+resultsCache:
+  enabled: false
+
+minio:
+  enabled: false

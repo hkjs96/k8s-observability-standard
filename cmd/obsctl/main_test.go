@@ -28,6 +28,25 @@ func TestParseValidateArgsStrictToolsAndTarget(t *testing.T) {
 	}
 }
 
+func TestParseValidateArgsProfileBasic(t *testing.T) {
+	target, opts, err := parseValidateArgs([]string{"profile", "basic", "--strict-tools"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if target != "profile/basic" {
+		t.Fatalf("target = %q, want profile/basic", target)
+	}
+	if !opts.StrictTools {
+		t.Fatal("StrictTools = false, want true")
+	}
+}
+
+func TestParseValidateArgsRejectsUnknownProfile(t *testing.T) {
+	if _, _, err := parseValidateArgs([]string{"profile", "mimir"}); err == nil {
+		t.Fatal("parseValidateArgs() error = nil, want error")
+	}
+}
+
 func TestParseValidateArgsRejectsUnknown(t *testing.T) {
 	if _, _, err := parseValidateArgs([]string{"--bad"}); err == nil {
 		t.Fatal("parseValidateArgs() error = nil, want error")

@@ -19,7 +19,7 @@ validation tooling.
 - Grafana dashboard ConfigMaps for cluster and namespace overview.
 - Prometheus alerting and recording rules with matching `.promtool.yaml` mirrors.
 - Security guardrail samples for network policy, namespace policy, and read-only RBAC.
-- Validation CLI under `cmd/obsctl` and PowerShell fallback scripts.
+- Validation CLI under `cmd/obsctl`.
 - CI templates for GitHub Actions, GitLab CI, and Jenkins.
 
 ## Validation Evidence
@@ -28,12 +28,12 @@ Last local validation performed:
 
 ```powershell
 go test ./...
-powershell -ExecutionPolicy Bypass -File scripts\validate-all.ps1
+go run ./cmd/obsctl validate --strict-tools
 ```
 
 Observed result:
 
-- Go tests passed for validation and file walking packages.
+- Go tests passed for all packages.
 - YAML parse check passed.
 - Helm template and lint passed for chart version `85.0.2`.
 - Rendered manifest validation passed with kubeconform.
@@ -55,8 +55,8 @@ inputs are supplied outside this repository:
 ## Known Limits
 
 - Phase 0-2 covers metrics and embedded Grafana only.
-- Logs, tracing, SLO generation, long-term metrics, and alternate dashboard UI
-  are documented as later profile work, not implemented here.
+- Logs profile validation has started in Phase 3; tracing, SLO generation,
+  long-term metrics, and alternate dashboard UI remain later profile work.
 - CI templates are portable examples. Each implementation may need provider
   specific cache, network, and tool installation adjustments.
 - `kubeconform` uses `-ignore-missing-schemas` because some CRDs do not have
@@ -65,5 +65,5 @@ inputs are supplied outside this repository:
 ## Recommended Next Work
 
 1. Validate the first implementation repository adoption against this standard.
-2. Implement profile-scoped `obsctl validate` targets from the validation roadmap.
+2. Add validators for future `logs`, `traces`, and `slo` profile targets from the validation roadmap.
 3. Execute the Phase 3 task breakdown for logs, tracing, and SLO profiles.

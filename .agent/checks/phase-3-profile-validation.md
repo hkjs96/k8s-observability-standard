@@ -9,6 +9,7 @@ applies_to:
   - "policies/**"
 commands:
   - "go run ./cmd/obsctl validate --strict-tools"
+  - "go run ./cmd/obsctl validate profile basic --strict-tools"
   - "go run ./cmd/obsctl validate sensitive"
 ---
 
@@ -18,12 +19,14 @@ Run:
 
 ```powershell
 go run ./cmd/obsctl validate --strict-tools
+go run ./cmd/obsctl validate profile basic --strict-tools
 go run ./cmd/obsctl validate sensitive
 ```
 
 Completion criteria:
 
 - Basic profile validation remains green.
+- `profile basic` remains equivalent to the Basic profile resource checks.
 - Any new profile resources render or have a documented validation gap.
 - Prometheus rules include matching `.promtool.yaml` mirrors.
 - No runtime-specific secret, endpoint, account, bucket, or identity value is committed.

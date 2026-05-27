@@ -12,6 +12,7 @@ Goal: add reusable values for Loki and Alloy logs collection.
 Deliverables:
 
 - `values/profiles/logs.yaml`
+- `values/profiles/logs-alloy.yaml`
 - sizing guidance for logs storage and retention
 - fictional example override
 
@@ -19,7 +20,7 @@ Acceptance criteria:
 
 - Values render without implementation-owned secrets or endpoints.
 - Labels follow the low-cardinality policy.
-- `obsctl validate --strict-tools` remains green or documents a profile-specific validation gap.
+- `obsctl validate --strict-tools` remains green.
 
 ### Task: Add Logs Validation
 
@@ -27,7 +28,7 @@ Goal: validate logs profile resources before adoption.
 
 Deliverables:
 
-- logs profile validation target design
+- `obsctl validate profile logs`
 - static label-cardinality checks
 - rendered manifest kubeconform check
 

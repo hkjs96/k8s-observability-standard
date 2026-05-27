@@ -7,7 +7,15 @@ validate-observability-standard:
   before_script:
     - apt-get update
     - apt-get install -y curl unzip python3 python3-pip
-    - sh scripts/install-validation-tools.sh
+    - python3 -m pip install PyYAML --break-system-packages
+    - curl -fsSL https://get.helm.sh/helm-v3.15.4-linux-amd64.tar.gz -o /tmp/helm.tar.gz
+    - tar -xzf /tmp/helm.tar.gz -C /tmp
+    - mv /tmp/linux-amd64/helm /usr/local/bin/helm
+    - curl -fsSL https://github.com/yannh/kubeconform/releases/download/v0.6.7/kubeconform-linux-amd64.tar.gz -o /tmp/kubeconform.tar.gz
+    - tar -xzf /tmp/kubeconform.tar.gz -C /usr/local/bin kubeconform
+    - curl -fsSL https://github.com/prometheus/prometheus/releases/download/v3.4.0/prometheus-3.4.0.linux-amd64.tar.gz -o /tmp/prometheus.tar.gz
+    - tar -xzf /tmp/prometheus.tar.gz -C /tmp
+    - mv /tmp/prometheus-3.4.0.linux-amd64/promtool /usr/local/bin/promtool
   script:
     - go run ./cmd/obsctl validate --strict-tools
   rules:

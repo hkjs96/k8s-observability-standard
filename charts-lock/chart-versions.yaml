@@ -14,3 +14,20 @@ spec:
       notes:
         - "Pinned for the Basic profile baseline."
         - "Review CRD upgrade notes before changing this version."
+    loki:
+      repository: https://grafana.github.io/helm-charts
+      chart: loki
+      version: 7.0.0
+      appVersion: 3.6.7
+      source: https://github.com/grafana/helm-charts/tree/main/charts/loki
+      notes:
+        - "Pinned for the Phase 3 logs profile baseline."
+        - "SingleBinary mode uses filesystem storage for reusable local rendering only."
+    alloy:
+      repository: https://grafana.github.io/helm-charts
+      chart: alloy
+      version: 1.8.2
+      appVersion: v1.16.1
+      source: https://github.com/grafana/helm-charts/tree/main/charts/alloy
+      notes:
+        - "Pinned for the Phase 3 logs collector profile baseline."

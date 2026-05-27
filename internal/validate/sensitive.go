@@ -23,7 +23,7 @@ func SensitiveValues() error {
 	forbidden := regexp.MustCompile(`adminPassword|access_key|secret_key|arn:aws|sourceRepos:\s*\['\*'\]|namespace:\s*'\*'|NodePort|admin123|shi-cluster|loki-chunks|ACCESS_KEY|SECRET_KEY`)
 	var hits []string
 	for _, file := range files {
-		if file == "internal/validate/sensitive.go" || file == "scripts/validate-sensitive-values.ps1" {
+		if file == "internal/validate/sensitive.go" {
 			continue
 		}
 		data, err := os.ReadFile(file)
@@ -41,12 +41,11 @@ func SensitiveValues() error {
 	}
 
 	allowedCustomers := map[string]bool{
-		"AGENTS.md":                             true,
-		".agent/checks/sensitive-values.md":     true,
-		".agent/rules/repository-boundary.md":   true,
-		"docs/00-overview.md":                   true,
-		"scripts/validate-sensitive-values.ps1": true,
-		"internal/validate/sensitive.go":        true,
+		"AGENTS.md":                           true,
+		".agent/checks/sensitive-values.md":   true,
+		".agent/rules/repository-boundary.md": true,
+		"docs/00-overview.md":                 true,
+		"internal/validate/sensitive.go":      true,
 	}
 	var customerHits []string
 	for _, file := range files {
