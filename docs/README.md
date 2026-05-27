@@ -35,3 +35,4 @@ Agent rules, workflows, checks, and path routing live in `.agent/`.
 - `15-traces-profile.md`: Traces profile values, OTLP guidance, smoke checks, and rollback notes
 - `16-slo-profile.md`: SLO workflow, generated rule validation, and error budget review
 - `17-local-k3d-smoke.md`: local Docker-based k3s smoke test using k3d
+- `work-summary-ko.md`: 한국어 작업 및 검증 결과 요약
