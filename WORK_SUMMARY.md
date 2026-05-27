@@ -56,6 +56,11 @@
   - k3s node reached `Ready`.
   - Basic `kube-prometheus-stack` Helm release deployed in `monitoring`.
   - Grafana, Prometheus, Alertmanager, kube-state-metrics, and node-exporter pods reached `Running`.
+  - Prometheus, Grafana, and Alertmanager HTTP readiness checks passed.
+  - Prometheus target API reported all active targets up.
+  - Grafana API found the standard Cluster Overview and Namespace Overview dashboards after applying dashboard ConfigMaps.
+  - PrometheusRule samples were applied and updated with the release label required by the installed Prometheus selector.
+  - Policy samples passed server-side dry-run validation; PodSecurity baseline warns on node-exporter host namespace/hostPath/hostPort usage, which is expected for the node-exporter daemonset.
 
 ## Validation
 
