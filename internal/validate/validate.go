@@ -31,9 +31,16 @@ func Run(target string, opts Options) error {
 }
 
 func selectChecks(target string, opts Options) ([]Check, error) {
+	basicProfile := []Check{
+		{Name: "yaml", Fn: func() error { return YAML(opts) }},
+		{Name: "basic", Fn: func() error { return Basic(opts) }},
+		{Name: "prometheus", Fn: func() error { return PrometheusRules(opts) }},
+		{Name: "sensitive", Fn: SensitiveValues},
+	}
 	all := []Check{
 		{Name: "yaml", Fn: func() error { return YAML(opts) }},
 		{Name: "basic", Fn: func() error { return Basic(opts) }},
+		{Name: "logs", Fn: func() error { return Logs(opts) }},
 		{Name: "argocd", Fn: ArgoCD},
 		{Name: "prometheus", Fn: func() error { return PrometheusRules(opts) }},
 		{Name: "sensitive", Fn: SensitiveValues},
@@ -41,6 +48,14 @@ func selectChecks(target string, opts Options) ([]Check, error) {
 
 	if target == "" || target == "all" {
 		return all, nil
+	}
+	switch target {
+	case "profile/basic":
+		return basicProfile, nil
+	case "profile/logs":
+		return []Check{{Name: "logs", Fn: func() error { return Logs(opts) }}}, nil
+	case "profile/traces", "profile/slo":
+		return nil, fmt.Errorf("validation target %q is not implemented because the profile is not present in this repository", target)
 	}
 	for _, check := range all {
 		if check.Name == target {

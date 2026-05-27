@@ -45,7 +45,6 @@ ARNs, credentials, or customer-specific cluster identifiers here.
 - `templates/`: assessment, security review, deployment, and handover templates
 - `examples/`: fictional example overlays and disposable smoke-test examples
 - `cmd/obsctl`: provider-neutral validation CLI
-- `scripts/validate-all.ps1`: fallback wrapper for environments without Go
 
 ## Agentic Workflow Model
 
@@ -55,7 +54,7 @@ Mandatory agent execution rules live in `.agent/`, not `docs/`.
 - `.agent/rules/` contains short mandatory constraints.
 - `.agent/workflows/` contains task-specific execution steps.
 - `.agent/checks/` maps validation criteria to scripts.
-- `scripts/` contains executable validation used by agents, hooks, and CI.
+- `cmd/obsctl` contains executable validation used by agents, hooks, and CI.
 
 `docs/` remains the human-facing standard and rationale.
 
@@ -72,9 +71,6 @@ python -c "import pathlib,yaml; [yaml.safe_load_all(p.read_text()) for p in path
 
 # Preferred local check.
 go run ./cmd/obsctl validate
-
-# Fallback wrapper. Uses Go when available, otherwise runs legacy PowerShell validators.
-powershell -ExecutionPolicy Bypass -File scripts/validate-all.ps1
 
 # Render the Basic profile after installing Helm.
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts

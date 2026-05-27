@@ -20,4 +20,4 @@ applies_to:
 - `policies/`: security and namespace policy samples
 - `templates/`: implementation assessment, security review, deployment, and handover templates
 - `examples/`: fictional implementation examples only
-- `scripts/`: local validation scripts used by agents, hooks, or CI
+- `cmd/obsctl`: Go validation and smoke-test CLI

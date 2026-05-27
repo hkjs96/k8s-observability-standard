@@ -1,7 +1,7 @@
 # obsctl Profile Validation Roadmap
 
 This roadmap defines the intended validation contract before Phase 3 profile
-resources are added. It does not implement new profile validators yet.
+resources are added.
 
 ## Current Contract
 
@@ -19,10 +19,16 @@ Current targets:
 - `prometheus`
 - `sensitive`
 - `all`
+- `profile basic`
+- `profile logs`
+
+The `profile traces` and `profile slo` targets are reserved and return a clear
+not-implemented error until those profiles exist in this repository.
 
 ## Future Contract
 
-Phase 3 should add profile-scoped targets without breaking the current command:
+Phase 3 should add profile-specific validators without breaking the current
+command:
 
 ```powershell
 go run ./cmd/obsctl validate profile basic --strict-tools

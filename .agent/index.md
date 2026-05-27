@@ -34,7 +34,7 @@ required `.agent/` files are read.
 | `docs/**` | Use `.agent/rules/repository-boundary.md`; keep docs human-facing. |
 | `templates/**` | `.agent/workflows/implementation-adoption.md`, `.agent/checks/implementation-adoption-validation.md` |
 | `.agent/**` | Keep front matter accurate and update this index if routing changes. |
-| `scripts/**` | Ensure checks remain idempotent and safe for local execution. |
+| `cmd/**`, `internal/**` | Run `go test ./...` and `go run ./cmd/obsctl validate`. |
 
 ## Completion Rule
 

@@ -26,16 +26,13 @@ tool paths such as `.tmp/tools/kubeconform.exe`, `.tmp/tools/kubeconform`,
 archives. Local work directories `.git/`, `.cache/`, and `.tmp/` are ignored by
 repository scans.
 
-For local Windows environments without Go, the fallback wrapper is:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts/validate-all.ps1
-```
+Local validation requires Go 1.22 or newer. The validation contract is the Go
+CLI, not legacy shell or PowerShell wrappers.
 
 ## Responsibilities
 
-Validation scripts check that the repository remains suitable for Argo CD
-GitOps consumption:
+The Go validator checks that the repository remains suitable for Argo CD GitOps
+consumption:
 
 - YAML files parse successfully.
 - Basic profile values render with the pinned Helm chart when Helm is available.

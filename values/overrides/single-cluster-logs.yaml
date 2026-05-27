@@ -1,0 +1,16 @@
+# Fictional single-cluster logs override.
+# Implementation repositories must replace retention and storage choices for real workloads.
+
+loki:
+  limits_config:
+    retention_period: 168h
+
+singleBinary:
+  persistence:
+    enabled: true
+    size: 50Gi
+
+alloy:
+  controller:
+    tolerations:
+      - operator: Exists

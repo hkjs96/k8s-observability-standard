@@ -6,7 +6,7 @@ applies_to:
   - "values/**"
   - "charts-lock/**"
 checks:
-  - go run ./cmd/obsctl validate basic
+  - go run ./cmd/obsctl validate profile basic
   - go run ./cmd/obsctl validate sensitive
 ---
 
@@ -17,3 +17,4 @@ checks:
 - Do not add Loki, Alloy, Tempo, Mimir, Sloth, Pyrra, or Perses unless the task explicitly expands scope.
 - Keep upstream chart versions pinned in `charts-lock/chart-versions.yaml`.
 - Keep values layered as common, profile, environment, sizing, then implementation override.
+- Use `obsctl validate profile <name>` for profile-scoped validation when the target exists.

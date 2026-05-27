@@ -28,6 +28,7 @@ Agent rules, workflows, checks, and path routing live in `.agent/`.
 - `08-phase-0-2-completion.md`: completed outputs, validation evidence, and known limits
 - `09-implementation-adoption.md`: implementation repository adoption guide
 - `10-phase-3-plan.md`: logs, tracing, and SLO planning
-- `11-obsctl-profile-validation-roadmap.md`: future profile validation CLI contract
+- `11-obsctl-profile-validation-roadmap.md`: profile validation CLI contract and roadmap
 - `12-phase-3-task-breakdown.md`: issue-ready Phase 3 task breakdown
 - `13-ec2-k3s-basic-smoke-runbook.md`: disposable EC2 k3s Basic profile smoke-test runbook
+- `14-logs-profile.md`: Logs profile values, validation, smoke queries, and rollback notes

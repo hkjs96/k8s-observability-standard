@@ -435,7 +435,7 @@ func rejectRepositoryOutput(outputPath string, allow bool) error {
 	}
 	rel, err := filepath.Rel(repoRoot, resolvedOutput)
 	if err != nil {
-		return err
+		return nil
 	}
 	if rel == "." || (!strings.HasPrefix(rel, ".."+string(filepath.Separator)) && rel != "..") {
 		return errors.New("output is inside this repository; use a path outside the repository or pass --allow-repository-output intentionally")

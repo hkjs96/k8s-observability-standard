@@ -115,16 +115,10 @@ From this repository, run strict validation before deployment:
 go run ./cmd/obsctl validate --strict-tools
 ```
 
-If tools are not installed locally, install them with the shared helper first:
-
-```bash
-sh scripts/install-validation-tools.sh
-```
-
 On Windows runners or workstations:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts\install-validation-tools.ps1
+go run ./cmd/obsctl validate
 ```
 
 ## Smoke Install
