@@ -55,6 +55,7 @@
   - k3d cluster `obs-standard-basic` created.
   - k3s node reached `Ready`.
   - Basic `kube-prometheus-stack` Helm release deployed in `monitoring`.
+  - Grafana smoke login is created by the helper as `admin` / `REPLACE_FOR_SMOKE_ONLY` unless overridden with `--grafana-admin-password`.
   - Grafana, Prometheus, Alertmanager, kube-state-metrics, and node-exporter pods reached `Running`.
   - Prometheus, Grafana, and Alertmanager HTTP readiness checks passed.
   - Prometheus target API reported all active targets up.

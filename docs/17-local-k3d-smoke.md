@@ -29,6 +29,19 @@ go run ./cmd/obsctl smoke k3s-basic install `
   --kubeconfig .tmp/kubeconfig/local-k3s.yaml
 ```
 
+By default the smoke helper creates the Grafana admin Secret with:
+
+- user: `admin`
+- password: `REPLACE_FOR_SMOKE_ONLY`
+
+You can override the password for a local run:
+
+```powershell
+go run ./cmd/obsctl smoke k3s-basic install `
+  --kubeconfig .tmp/kubeconfig/local-k3s.yaml `
+  --grafana-admin-password local-smoke-password
+```
+
 Expected evidence:
 
 ```powershell

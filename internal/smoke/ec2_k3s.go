@@ -306,6 +306,8 @@ func installK3sBasic(args []string, r runner) error {
 	kubeconfig := fs.String("kubeconfig", "", "kubeconfig path")
 	namespace := fs.String("namespace", "monitoring", "target namespace")
 	releaseName := fs.String("release-name", "kube-prometheus-stack", "Helm release name")
+	grafanaAdminUser := fs.String("grafana-admin-user", "admin", "Grafana smoke-test admin user")
+	grafanaAdminPassword := fs.String("grafana-admin-password", "REPLACE_FOR_SMOKE_ONLY", "Grafana smoke-test admin password")
 	skipValidation := fs.Bool("skip-validation", false, "skip repository strict validation")
 	dryRun := fs.Bool("dry-run", false, "print commands without executing")
 	if err := fs.Parse(args); err != nil {
@@ -344,7 +346,7 @@ func installK3sBasic(args []string, r runner) error {
 		}
 		printCommand("kubectl", []string{"create", "namespace", *namespace, "--dry-run=client", "-o", "yaml"})
 		printCommand("kubectl", []string{"apply", "-f", "-"})
-		printCommand("kubectl", []string{"-n", *namespace, "create", "secret", "generic", "grafana-admin", "--from-literal=admin-user=admin", "--from-literal=admin-password=REPLACE_FOR_SMOKE_ONLY", "--dry-run=client", "-o", "yaml"})
+		printCommand("kubectl", []string{"-n", *namespace, "create", "secret", "generic", "grafana-admin", "--from-literal=admin-user=" + *grafanaAdminUser, "--from-literal=admin-password=" + *grafanaAdminPassword, "--dry-run=client", "-o", "yaml"})
 		printCommand("kubectl", []string{"apply", "-f", "-"})
 		for _, command := range commands {
 			printCommand(command[0], command[1:])
@@ -367,7 +369,7 @@ func installK3sBasic(args []string, r runner) error {
 	if err := runCommand(r, env, namespaceYAML, "kubectl", "apply", "-f", "-"); err != nil {
 		return err
 	}
-	secretYAML, err := r.RunWithInputEnv("kubectl", []string{"-n", *namespace, "create", "secret", "generic", "grafana-admin", "--from-literal=admin-user=admin", "--from-literal=admin-password=REPLACE_FOR_SMOKE_ONLY", "--dry-run=client", "-o", "yaml"}, nil, env)
+	secretYAML, err := r.RunWithInputEnv("kubectl", []string{"-n", *namespace, "create", "secret", "generic", "grafana-admin", "--from-literal=admin-user=" + *grafanaAdminUser, "--from-literal=admin-password=" + *grafanaAdminPassword, "--dry-run=client", "-o", "yaml"}, nil, env)
 	if err != nil {
 		return fmt.Errorf("kubectl create grafana-admin dry-run failed: %w\n%s", err, strings.TrimSpace(string(secretYAML)))
 	}
@@ -380,6 +382,7 @@ func installK3sBasic(args []string, r runner) error {
 		}
 	}
 	fmt.Println("k3s Basic smoke test ok")
+	fmt.Printf("Grafana smoke login: %s / %s\n", *grafanaAdminUser, *grafanaAdminPassword)
 	return nil
 }
 
@@ -473,11 +476,12 @@ Usage:
   obsctl smoke ec2-k3s terminate --region REGION --instance-id ID [--yes|--dry-run]
   obsctl smoke local-k3s create [--name NAME] [--kubeconfig PATH] [--dry-run]
   obsctl smoke local-k3s delete [--name NAME] [--dry-run]
-  obsctl smoke k3s-basic install --kubeconfig PATH [--namespace monitoring] [--release-name kube-prometheus-stack] [--dry-run]
+  obsctl smoke k3s-basic install --kubeconfig PATH [--namespace monitoring] [--release-name kube-prometheus-stack] [--grafana-admin-password PASSWORD] [--dry-run]
 
 Safety:
   launch and terminate require --yes for real AWS changes.
   local-k3s uses k3d and Docker to create a disposable local k3s cluster.
+  k3s-basic creates the Grafana admin Secret with a smoke-only default password.
   use --dry-run to print the AWS CLI calls without executing them.
   fetch-kubeconfig refuses repository-local output unless --allow-repository-output is set.`)
 	return nil
