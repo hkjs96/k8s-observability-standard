@@ -46,6 +46,16 @@
   - promtool validation through the existing rule validator
   - static implementation-owned escalation checks
 - Updated `.agent` routing/checks to include profile-scoped validation.
+- Added local Docker-based k3s smoke commands through k3d:
+  - `go run ./cmd/obsctl smoke local-k3s create`
+  - `go run ./cmd/obsctl smoke local-k3s delete`
+  - `docs/17-local-k3d-smoke.md`
+- Ran local k3s smoke on this workstation:
+  - Docker Desktop started successfully.
+  - k3d cluster `obs-standard-basic` created.
+  - k3s node reached `Ready`.
+  - Basic `kube-prometheus-stack` Helm release deployed in `monitoring`.
+  - Grafana, Prometheus, Alertmanager, kube-state-metrics, and node-exporter pods reached `Running`.
 
 ## Validation
 
@@ -67,4 +77,3 @@ go run ./cmd/obsctl validate sensitive
 2. Decide whether traces profile should keep the deprecated single binary Tempo chart or move to another deployment model before production adoption.
 3. Decide whether SLO generation should standardize on Sloth, Pyrra, or provider-specific tooling.
 4. Add implementation repository adoption evidence once the first real adoption is tested.
-5. Open a GitHub PR when GitHub CLI or connector-based PR creation is available.

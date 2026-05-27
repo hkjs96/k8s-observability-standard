@@ -74,6 +74,20 @@ func run(args []string, r runner) error {
 		default:
 			return fmt.Errorf("unknown smoke k3s-basic command %q", args[1])
 		}
+	case "local-k3s":
+		if len(args) < 2 {
+			return Usage()
+		}
+		switch args[1] {
+		case "create":
+			return createLocalK3s(args[2:], r)
+		case "delete":
+			return deleteLocalK3s(args[2:], r)
+		case "help", "-h", "--help":
+			return Usage()
+		default:
+			return fmt.Errorf("unknown smoke local-k3s command %q", args[1])
+		}
 	case "help", "-h", "--help":
 		return Usage()
 	default:
@@ -369,6 +383,86 @@ func installK3sBasic(args []string, r runner) error {
 	return nil
 }
 
+func createLocalK3s(args []string, r runner) error {
+	fs := flag.NewFlagSet("create", flag.ContinueOnError)
+	fs.SetOutput(os.Stderr)
+	name := fs.String("name", "obs-standard-basic", "k3d cluster name")
+	image := fs.String("image", "rancher/k3s:v1.29.6-k3s1", "k3s image")
+	kubeconfig := fs.String("kubeconfig", filepath.Join(".tmp", "kubeconfig", "local-k3s.yaml"), "kubeconfig output path")
+	dryRun := fs.Bool("dry-run", false, "print k3d calls without executing")
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+	if *name == "" {
+		return errors.New("missing required flag: --name")
+	}
+	if *kubeconfig == "" {
+		return errors.New("missing required flag: --kubeconfig")
+	}
+
+	createArgs := []string{
+		"cluster", "create", *name,
+		"--image", *image,
+		"--servers", "1",
+		"--agents", "0",
+		"--wait",
+		"--timeout", "180s",
+	}
+	writeArgs := []string{"kubeconfig", "write", *name, "--output", *kubeconfig}
+	if *dryRun {
+		printCommand("k3d", createArgs)
+		printCommand("k3d", writeArgs)
+		return nil
+	}
+
+	if err := runCommand(r, nil, nil, "docker", "version"); err != nil {
+		return fmt.Errorf("docker daemon check failed: %w", err)
+	}
+	if err := runCommand(r, nil, nil, "k3d", createArgs...); err != nil {
+		return err
+	}
+	if err := os.MkdirAll(filepath.Dir(*kubeconfig), 0o755); err != nil {
+		return err
+	}
+	if err := runCommand(r, nil, nil, "k3d", writeArgs...); err != nil {
+		return err
+	}
+	if err := rewriteK3dKubeconfigHost(*kubeconfig); err != nil {
+		return err
+	}
+	fmt.Println("local k3s kubeconfig:", *kubeconfig)
+	return nil
+}
+
+func deleteLocalK3s(args []string, r runner) error {
+	fs := flag.NewFlagSet("delete", flag.ContinueOnError)
+	fs.SetOutput(os.Stderr)
+	name := fs.String("name", "obs-standard-basic", "k3d cluster name")
+	dryRun := fs.Bool("dry-run", false, "print k3d calls without executing")
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+	if *name == "" {
+		return errors.New("missing required flag: --name")
+	}
+
+	deleteArgs := []string{"cluster", "delete", *name}
+	if *dryRun {
+		printCommand("k3d", deleteArgs)
+		return nil
+	}
+	return runCommand(r, nil, nil, "k3d", deleteArgs...)
+}
+
+func rewriteK3dKubeconfigHost(path string) error {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return err
+	}
+	rendered := strings.ReplaceAll(string(data), "https://host.docker.internal:", "https://127.0.0.1:")
+	return os.WriteFile(path, []byte(rendered), 0o600)
+}
+
 // Usage prints smoke helper usage.
 func Usage() error {
 	fmt.Println(`obsctl smoke helpers.
@@ -377,10 +471,13 @@ Usage:
   obsctl smoke ec2-k3s launch --region REGION --ami-id AMI --instance-type TYPE --key-name KEY --subnet-id SUBNET --security-group-id SG [--yes|--dry-run]
   obsctl smoke ec2-k3s fetch-kubeconfig --host HOST --key-path KEY --output PATH [--server-host HOST] [--force]
   obsctl smoke ec2-k3s terminate --region REGION --instance-id ID [--yes|--dry-run]
+  obsctl smoke local-k3s create [--name NAME] [--kubeconfig PATH] [--dry-run]
+  obsctl smoke local-k3s delete [--name NAME] [--dry-run]
   obsctl smoke k3s-basic install --kubeconfig PATH [--namespace monitoring] [--release-name kube-prometheus-stack] [--dry-run]
 
 Safety:
   launch and terminate require --yes for real AWS changes.
+  local-k3s uses k3d and Docker to create a disposable local k3s cluster.
   use --dry-run to print the AWS CLI calls without executing them.
   fetch-kubeconfig refuses repository-local output unless --allow-repository-output is set.`)
 	return nil
