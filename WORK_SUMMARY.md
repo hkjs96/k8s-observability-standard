@@ -26,6 +26,25 @@
   - Helm render for Loki and Alloy
   - kubeconform validation for rendered manifests
   - static high-cardinality log label checks
+- Added the Phase 3 traces profile baseline:
+  - pinned Tempo chart `1.24.4`
+  - reusable Tempo values
+  - fictional single-cluster traces override
+  - OpenTelemetry Operator instrumentation sample
+  - traces profile documentation and smoke checks
+- Added traces validation:
+  - Helm render for Tempo
+  - kubeconform validation for rendered manifests
+  - static implementation-owned endpoint and tenant checks
+- Added the Phase 3 SLO profile workflow:
+  - fictional source SLO spec
+  - generated-style PrometheusRule sample
+  - promtool mirror
+  - error budget review template
+- Added SLO validation:
+  - required artifact checks
+  - promtool validation through the existing rule validator
+  - static implementation-owned escalation checks
 - Updated `.agent` routing/checks to include profile-scoped validation.
 
 ## Validation
@@ -37,13 +56,15 @@ go test ./...
 go run ./cmd/obsctl validate --strict-tools
 go run ./cmd/obsctl validate profile basic --strict-tools
 go run ./cmd/obsctl validate profile logs --strict-tools
+go run ./cmd/obsctl validate profile traces --strict-tools
+go run ./cmd/obsctl validate profile slo --strict-tools
 go run ./cmd/obsctl validate sensitive
 ```
 
 ## Next Work
 
-1. Add traces profile values and validation.
-2. Add SLO profile workflow and validation.
-3. Decide whether logs profile should stay `SingleBinary` for small deployments or require implementation-managed object storage for production.
+1. Decide whether logs profile should stay `SingleBinary` for small deployments or require implementation-managed object storage for production.
+2. Decide whether traces profile should keep the deprecated single binary Tempo chart or move to another deployment model before production adoption.
+3. Decide whether SLO generation should standardize on Sloth, Pyrra, or provider-specific tooling.
 4. Add implementation repository adoption evidence once the first real adoption is tested.
 5. Open a GitHub PR when GitHub CLI or connector-based PR creation is available.

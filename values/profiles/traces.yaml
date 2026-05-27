@@ -1,0 +1,24 @@
+# Traces profile overlay for grafana/tempo.
+# Keep real tenant, storage, and endpoint values in implementation repositories.
+
+serviceMonitor:
+  enabled: true
+
+persistence:
+  enabled: false
+
+tempo:
+  reportingEnabled: false
+  retention: 24h
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+  storage:
+    trace:
+      backend: local
+      local:
+        path: /var/tempo/traces

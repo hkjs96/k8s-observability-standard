@@ -1,0 +1,28 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: example-availability-slo
+  namespace: monitoring
+  labels:
+    observability.standard/rule-source: standard
+    observability.standard/profile: slo
+spec:
+  groups:
+    - name: slo.example-service.availability
+      rules:
+        - record: slo:example_service_availability:ratio_rate5m
+          expr: |
+            sum(rate(http_requests_total{service="example-service",code!~"5.."}[5m]))
+            /
+            sum(rate(http_requests_total{service="example-service"}[5m]))
+        - alert: ExampleServiceAvailabilitySLOBurnRateHigh
+          expr: |
+            (1 - slo:example_service_availability:ratio_rate5m) > (14.4 * (1 - 0.999))
+          for: 5m
+          labels:
+            severity: page
+            slo: example-service-availability
+          annotations:
+            summary: "Example service availability SLO burn rate is high."
+            description: "The fictional example service is burning error budget faster than expected."
+            runbook_url: "https://runbooks.example.invalid/observability/slo/example-service-availability"

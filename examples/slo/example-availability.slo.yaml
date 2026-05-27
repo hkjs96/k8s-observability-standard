@@ -1,0 +1,15 @@
+apiVersion: observability.standard/v1
+kind: ServiceLevelObjective
+metadata:
+  name: example-service-availability
+spec:
+  service: example-service
+  objective: 99.9
+  window: 30d
+  sli:
+    type: availability
+    goodEvents: sum(rate(http_requests_total{service="example-service",code!~"5.."}[5m]))
+    totalEvents: sum(rate(http_requests_total{service="example-service"}[5m]))
+  alerting:
+    pageSeverity: page
+    ticketSeverity: warning

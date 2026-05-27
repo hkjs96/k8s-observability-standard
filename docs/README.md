@@ -32,3 +32,5 @@ Agent rules, workflows, checks, and path routing live in `.agent/`.
 - `12-phase-3-task-breakdown.md`: issue-ready Phase 3 task breakdown
 - `13-ec2-k3s-basic-smoke-runbook.md`: disposable EC2 k3s Basic profile smoke-test runbook
 - `14-logs-profile.md`: Logs profile values, validation, smoke queries, and rollback notes
+- `15-traces-profile.md`: Traces profile values, OTLP guidance, smoke checks, and rollback notes
+- `16-slo-profile.md`: SLO workflow, generated rule validation, and error budget review
