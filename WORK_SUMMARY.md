@@ -60,6 +60,9 @@
   - Prometheus, Grafana, and Alertmanager HTTP readiness checks passed.
   - Prometheus target API reported all active targets up.
   - Grafana API found the standard Cluster Overview and Namespace Overview dashboards after applying dashboard ConfigMaps.
+  - Added Grafana-managed alert provisioning for logs/traces profile checks.
+  - Added Loki and Tempo datasource provisioning plus Logs Overview and Traces Overview dashboards.
+  - Installed Loki, Alloy, and Tempo into local k3s and confirmed Grafana sees Loki/Tempo datasources, Logs/Traces dashboards, and two Grafana-managed alert rules.
   - PrometheusRule samples were applied and updated with the release label required by the installed Prometheus selector.
   - Policy samples passed server-side dry-run validation; PodSecurity baseline warns on node-exporter host namespace/hostPath/hostPort usage, which is expected for the node-exporter daemonset.
 

@@ -47,6 +47,18 @@ go run ./cmd/obsctl validate --strict-tools
 The traces validator renders Tempo, runs kubeconform on rendered manifests, and
 rejects implementation-owned trace endpoint and tenant patterns.
 
+## Grafana UI
+
+Traces profile UI is managed through Grafana provisioning:
+
+- `dashboards/grafana/observability-datasources.yaml`
+- `dashboards/grafana/traces-overview.yaml`
+- `dashboards/grafana/profile-alerting.yaml`
+
+Use Grafana-managed alerts for trace and dashboard-driven checks. Keep
+platform-critical scrape and component availability alerts in PrometheusRule
+resources.
+
 ## Smoke Check
 
 Run from an implementation repository after deployment:

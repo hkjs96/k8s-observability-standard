@@ -6,8 +6,13 @@ reviewed and sanitized before being copied here.
 
 ## Added
 
-- `cluster-overview.yaml` — CPU/memory by namespace, node CPU utilisation
-- `namespace-overview.yaml` — per-namespace CPU/memory/pod status with namespace variable
+- `cluster-overview.yaml` - CPU/memory by namespace, node CPU utilisation
+- `namespace-overview.yaml` - per-namespace CPU/memory/pod status with namespace variable
+- `observability-datasources.yaml` - Loki and Tempo datasource provisioning for profile smoke tests
+- `logs-overview.yaml` - Loki log volume, error-like logs, and recent logs
+- `traces-overview.yaml` - Tempo target health and trace ingestion metrics
+- `profile-alerting.yaml` - Grafana-managed alert rules for logs/traces profile checks
+- `profile-notifiers.yaml` - example Grafana contact point and notification policy
 
 ## Remaining Candidates For Phase 2 Review
 
@@ -21,6 +26,9 @@ reviewed and sanitized before being copied here.
 ## Adoption Rules
 
 - Dashboard ConfigMaps must use `grafana_dashboard=1`.
+- Datasource ConfigMaps must use `grafana_datasource=1`.
+- Grafana-managed alert ConfigMaps must use `grafana_alert=1`.
+- Grafana contact point and notification policy ConfigMaps must use `grafana_alert=1`.
 - Folder placement should use the `grafana_folder` annotation.
 - Dashboards must not contain real cluster names, datasource UIDs from a live
   environment, hostnames, account IDs, or customer labels.
