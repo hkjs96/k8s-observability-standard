@@ -1,0 +1,42 @@
+# Traces profile overlay for grafana/tempo.
+# Keep real tenant, storage, and endpoint values in implementation repositories.
+
+serviceMonitor:
+  enabled: true
+  additionalLabels:
+    release: kube-prometheus-stack
+
+persistence:
+  enabled: false
+
+tempo:
+  reportingEnabled: false
+  retention: 24h
+  metricsGenerator:
+    enabled: true
+    remoteWriteUrl: http://kube-prometheus-stack-prometheus.monitoring:9090/api/v1/write
+    processor:
+      service_graphs: {}
+      span_metrics: {}
+    storage:
+      path: /tmp/tempo/generator/wal
+    traces_storage:
+      path: /tmp/tempo/generator/traces
+  overrides:
+    defaults:
+      metrics_generator:
+        processors:
+          - service-graphs
+          - span-metrics
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+  storage:
+    trace:
+      backend: local
+      local:
+        path: /var/tempo/traces

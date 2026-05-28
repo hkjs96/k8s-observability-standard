@@ -60,6 +60,7 @@ func checkLogLabelCardinality() error {
 	files := []string{
 		"values/profiles/logs.yaml",
 		"values/profiles/logs-alloy.yaml",
+		"examples/phase3-smoke/log-generator.yaml",
 	}
 	forbidden := []string{
 		"__meta_kubernetes_pod_uid",

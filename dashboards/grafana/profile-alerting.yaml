@@ -1,0 +1,120 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-alerting-observability-profiles
+  namespace: monitoring
+  labels:
+    grafana_alert: "1"
+data:
+  rules.yaml: |
+    apiVersion: 1
+    groups:
+      - orgId: 1
+        name: observability-profile-alerts
+        folder: Observability Profiles
+        interval: 1m
+        rules:
+          - uid: logs-error-like-lines
+            title: Logs Error-like Lines Detected
+            condition: C
+            data:
+              - refId: A
+                datasourceUid: loki
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                model:
+                  expr: sum(count_over_time({namespace=~".+"} |~ "(?i)(error|exception|fail)" [5m]))
+                  refId: A
+              - refId: B
+                datasourceUid: __expr__
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                model:
+                  type: reduce
+                  expression: A
+                  reducer: last
+                  refId: B
+              - refId: C
+                datasourceUid: __expr__
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                model:
+                  type: threshold
+                  expression: B
+                  conditions:
+                    - evaluator:
+                        type: gt
+                        params:
+                          - 0
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - C
+                      reducer:
+                        type: last
+                      type: query
+                  refId: C
+            noDataState: OK
+            execErrState: Error
+            for: 5m
+            labels:
+              profile: logs
+              severity: warning
+            annotations:
+              summary: Error-like log lines detected.
+          - uid: tempo-targets-down
+            title: Tempo Targets Down
+            condition: C
+            data:
+              - refId: A
+                datasourceUid: prometheus
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                model:
+                  expr: sum(up{namespace="observability-traces"} == 0)
+                  refId: A
+              - refId: B
+                datasourceUid: __expr__
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                model:
+                  type: reduce
+                  expression: A
+                  reducer: last
+                  refId: B
+              - refId: C
+                datasourceUid: __expr__
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                model:
+                  type: threshold
+                  expression: B
+                  conditions:
+                    - evaluator:
+                        type: gt
+                        params:
+                          - 0
+                      operator:
+                        type: and
+                      query:
+                        params:
+                          - C
+                      reducer:
+                        type: last
+                      type: query
+                  refId: C
+            noDataState: OK
+            execErrState: Error
+            for: 5m
+            labels:
+              profile: traces
+              severity: warning
+            annotations:
+              summary: Tempo scrape targets are down.

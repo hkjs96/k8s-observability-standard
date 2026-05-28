@@ -23,6 +23,7 @@ Planned outputs:
 - Low-cardinality label policy.
 - Java multiline parser sample.
 - Log query smoke test.
+- Local log generator smoke workload.
 - Storage and retention guidance.
 
 Validation additions:
@@ -48,6 +49,7 @@ Planned outputs:
 - OpenTelemetry Operator instrumentation samples.
 - Grafana trace-to-logs settings.
 - Trace smoke test.
+- Local telemetrygen trace smoke workload.
 
 Validation additions:
 
@@ -71,6 +73,7 @@ Planned outputs:
 - Availability and latency SLO examples.
 - Alert routing guidance for burn-rate alerts.
 - Error budget review template.
+- Local SLO metrics generator and Grafana SLO dashboard.
 
 Validation additions:
 

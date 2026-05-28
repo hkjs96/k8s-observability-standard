@@ -82,6 +82,11 @@ grafana:
     datasources:
       enabled: true
       defaultDatasourceEnabled: true
+    alerts:
+      enabled: true
+      label: grafana_alert
+      labelValue: "1"
+      searchNamespace: monitoring
   additionalDataSources: []
 
 prometheus:

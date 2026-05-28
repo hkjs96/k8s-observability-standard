@@ -129,6 +129,11 @@ Run the Basic smoke script against the temporary kubeconfig:
 go run ./cmd/obsctl smoke k3s-basic install --kubeconfig REPLACE_WITH_KUBECONFIG_PATH
 ```
 
+The smoke helper creates a `grafana-admin` Secret if one does not already
+exist. The default smoke-only login is `admin` /
+`REPLACE_FOR_SMOKE_ONLY`; pass `--grafana-admin-password` to override it for a
+local disposable run. Do not use the default password outside smoke testing.
+
 Expected cluster evidence:
 
 ```powershell

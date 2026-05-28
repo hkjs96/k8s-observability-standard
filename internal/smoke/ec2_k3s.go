@@ -74,6 +74,32 @@ func run(args []string, r runner) error {
 		default:
 			return fmt.Errorf("unknown smoke k3s-basic command %q", args[1])
 		}
+	case "k3s-phase3":
+		if len(args) < 2 {
+			return Usage()
+		}
+		switch args[1] {
+		case "install":
+			return installK3sPhase3(args[2:], r)
+		case "help", "-h", "--help":
+			return Usage()
+		default:
+			return fmt.Errorf("unknown smoke k3s-phase3 command %q", args[1])
+		}
+	case "local-k3s":
+		if len(args) < 2 {
+			return Usage()
+		}
+		switch args[1] {
+		case "create":
+			return createLocalK3s(args[2:], r)
+		case "delete":
+			return deleteLocalK3s(args[2:], r)
+		case "help", "-h", "--help":
+			return Usage()
+		default:
+			return fmt.Errorf("unknown smoke local-k3s command %q", args[1])
+		}
 	case "help", "-h", "--help":
 		return Usage()
 	default:
@@ -292,6 +318,8 @@ func installK3sBasic(args []string, r runner) error {
 	kubeconfig := fs.String("kubeconfig", "", "kubeconfig path")
 	namespace := fs.String("namespace", "monitoring", "target namespace")
 	releaseName := fs.String("release-name", "kube-prometheus-stack", "Helm release name")
+	grafanaAdminUser := fs.String("grafana-admin-user", "admin", "Grafana smoke-test admin user")
+	grafanaAdminPassword := fs.String("grafana-admin-password", "REPLACE_FOR_SMOKE_ONLY", "Grafana smoke-test admin password")
 	skipValidation := fs.Bool("skip-validation", false, "skip repository strict validation")
 	dryRun := fs.Bool("dry-run", false, "print commands without executing")
 	if err := fs.Parse(args); err != nil {
@@ -330,7 +358,7 @@ func installK3sBasic(args []string, r runner) error {
 		}
 		printCommand("kubectl", []string{"create", "namespace", *namespace, "--dry-run=client", "-o", "yaml"})
 		printCommand("kubectl", []string{"apply", "-f", "-"})
-		printCommand("kubectl", []string{"-n", *namespace, "create", "secret", "generic", "grafana-admin", "--from-literal=admin-user=admin", "--from-literal=admin-password=REPLACE_FOR_SMOKE_ONLY", "--dry-run=client", "-o", "yaml"})
+		printCommand("kubectl", []string{"-n", *namespace, "create", "secret", "generic", "grafana-admin", "--from-literal=admin-user=" + *grafanaAdminUser, "--from-literal=admin-password=" + *grafanaAdminPassword, "--dry-run=client", "-o", "yaml"})
 		printCommand("kubectl", []string{"apply", "-f", "-"})
 		for _, command := range commands {
 			printCommand(command[0], command[1:])
@@ -353,7 +381,7 @@ func installK3sBasic(args []string, r runner) error {
 	if err := runCommand(r, env, namespaceYAML, "kubectl", "apply", "-f", "-"); err != nil {
 		return err
 	}
-	secretYAML, err := r.RunWithInputEnv("kubectl", []string{"-n", *namespace, "create", "secret", "generic", "grafana-admin", "--from-literal=admin-user=admin", "--from-literal=admin-password=REPLACE_FOR_SMOKE_ONLY", "--dry-run=client", "-o", "yaml"}, nil, env)
+	secretYAML, err := r.RunWithInputEnv("kubectl", []string{"-n", *namespace, "create", "secret", "generic", "grafana-admin", "--from-literal=admin-user=" + *grafanaAdminUser, "--from-literal=admin-password=" + *grafanaAdminPassword, "--dry-run=client", "-o", "yaml"}, nil, env)
 	if err != nil {
 		return fmt.Errorf("kubectl create grafana-admin dry-run failed: %w\n%s", err, strings.TrimSpace(string(secretYAML)))
 	}
@@ -366,7 +394,208 @@ func installK3sBasic(args []string, r runner) error {
 		}
 	}
 	fmt.Println("k3s Basic smoke test ok")
+	fmt.Printf("Grafana smoke login: %s / %s\n", *grafanaAdminUser, *grafanaAdminPassword)
 	return nil
+}
+
+func installK3sPhase3(args []string, r runner) error {
+	fs := flag.NewFlagSet("install", flag.ContinueOnError)
+	fs.SetOutput(os.Stderr)
+	kubeconfig := fs.String("kubeconfig", "", "kubeconfig path")
+	skipValidation := fs.Bool("skip-validation", false, "skip repository strict validation")
+	skipSmokeWorkload := fs.Bool("skip-smoke-workload", false, "skip applying example telemetry workload")
+	dryRun := fs.Bool("dry-run", false, "print commands without executing")
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+	if *kubeconfig == "" {
+		return errors.New("missing required flag: --kubeconfig")
+	}
+	if _, err := os.Stat(*kubeconfig); err != nil {
+		return fmt.Errorf("kubeconfig not found: %s", *kubeconfig)
+	}
+
+	env := []string{"KUBECONFIG=" + *kubeconfig}
+	commands := [][]string{
+		{"kubectl", "create", "namespace", "observability-logs", "--dry-run=client", "-o", "yaml"},
+		{"kubectl", "apply", "-f", "-"},
+		{"kubectl", "create", "namespace", "observability-traces", "--dry-run=client", "-o", "yaml"},
+		{"kubectl", "apply", "-f", "-"},
+		{"helm", "repo", "add", "prometheus-community", "https://prometheus-community.github.io/helm-charts"},
+		{"helm", "repo", "add", "grafana", "https://grafana.github.io/helm-charts"},
+		{"helm", "repo", "update"},
+		{"helm", "upgrade", "--install", "kube-prometheus-stack", "prometheus-community/kube-prometheus-stack",
+			"--version", "85.0.2",
+			"--namespace", "monitoring",
+			"-f", "values/common/kube-prometheus-stack.yaml",
+			"-f", "values/profiles/basic.yaml",
+			"-f", "values/profiles/traces-prometheus.yaml",
+			"-f", "values/env/dev.yaml",
+			"-f", "values/sizing/small.yaml",
+			"--wait",
+			"--timeout", "15m"},
+		{"helm", "upgrade", "--install", "loki", "grafana/loki",
+			"--version", "7.0.0",
+			"--namespace", "observability-logs",
+			"-f", "values/profiles/logs.yaml",
+			"--wait",
+			"--timeout", "10m"},
+		{"helm", "upgrade", "--install", "alloy", "grafana/alloy",
+			"--version", "1.8.2",
+			"--namespace", "observability-logs",
+			"-f", "values/profiles/logs-alloy.yaml",
+			"--wait",
+			"--timeout", "10m"},
+		{"helm", "upgrade", "--install", "tempo", "grafana/tempo",
+			"--version", "1.24.4",
+			"--namespace", "observability-traces",
+			"-f", "values/profiles/traces.yaml",
+			"--wait",
+			"--timeout", "10m"},
+		{"kubectl", "apply",
+			"-f", "dashboards/grafana/observability-datasources.yaml",
+			"-f", "dashboards/grafana/logs-overview.yaml",
+			"-f", "dashboards/grafana/traces-overview.yaml",
+			"-f", "dashboards/grafana/slo-overview.yaml",
+			"-f", "dashboards/grafana/profile-alerting.yaml",
+			"-f", "dashboards/grafana/profile-notifiers.yaml"},
+	}
+	if !*skipSmokeWorkload {
+		commands = append(commands,
+			[]string{"kubectl", "apply", "-f", "examples/phase3-smoke/namespace.yaml"},
+			[]string{"kubectl", "apply", "-f", "examples/phase3-smoke/log-generator.yaml"},
+			[]string{"kubectl", "apply", "-f", "examples/phase3-smoke/slo-metrics-generator.yaml"},
+			[]string{"kubectl", "apply", "-f", "examples/phase3-smoke/example-application.yaml"},
+			[]string{"kubectl", "-n", "observability-smoke", "delete", "job", "example-trace-generator", "--ignore-not-found=true"},
+			[]string{"kubectl", "apply", "-f", "examples/phase3-smoke/trace-generator.yaml"},
+		)
+	}
+	commands = append(commands,
+		[]string{"kubectl", "-n", "observability-logs", "get", "pods"},
+		[]string{"kubectl", "-n", "observability-traces", "get", "pods"},
+	)
+	if !*skipSmokeWorkload {
+		commands = append(commands, []string{"kubectl", "-n", "observability-smoke", "get", "pods"})
+	}
+
+	if *dryRun {
+		if !*skipValidation {
+			fmt.Println("go run ./cmd/obsctl validate --strict-tools")
+		}
+		for _, command := range commands {
+			printCommand(command[0], command[1:])
+		}
+		return nil
+	}
+
+	if !*skipValidation {
+		if err := validate.Run("all", validate.Options{StrictTools: true}); err != nil {
+			return err
+		}
+	}
+	for i := 0; i < len(commands); i++ {
+		command := commands[i]
+		if len(command) >= 5 && command[0] == "kubectl" && command[1] == "create" && command[2] == "namespace" {
+			out, err := r.RunWithInputEnv(command[0], command[1:], nil, env)
+			if len(out) > 0 {
+				fmt.Print(string(out))
+			}
+			if err != nil {
+				return fmt.Errorf("%s failed: %w", command[0], err)
+			}
+			i++
+			apply := commands[i]
+			if err := runCommand(r, env, out, apply[0], apply[1:]...); err != nil {
+				return err
+			}
+			continue
+		}
+		if err := runCommand(r, env, nil, command[0], command[1:]...); err != nil {
+			return err
+		}
+	}
+	fmt.Println("k3s Phase 3 smoke install ok")
+	return nil
+}
+
+func createLocalK3s(args []string, r runner) error {
+	fs := flag.NewFlagSet("create", flag.ContinueOnError)
+	fs.SetOutput(os.Stderr)
+	name := fs.String("name", "obs-standard-basic", "k3d cluster name")
+	image := fs.String("image", "rancher/k3s:v1.29.6-k3s1", "k3s image")
+	kubeconfig := fs.String("kubeconfig", filepath.Join(".tmp", "kubeconfig", "local-k3s.yaml"), "kubeconfig output path")
+	dryRun := fs.Bool("dry-run", false, "print k3d calls without executing")
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+	if *name == "" {
+		return errors.New("missing required flag: --name")
+	}
+	if *kubeconfig == "" {
+		return errors.New("missing required flag: --kubeconfig")
+	}
+
+	createArgs := []string{
+		"cluster", "create", *name,
+		"--image", *image,
+		"--servers", "1",
+		"--agents", "0",
+		"--wait",
+		"--timeout", "180s",
+	}
+	writeArgs := []string{"kubeconfig", "write", *name, "--output", *kubeconfig}
+	if *dryRun {
+		printCommand("k3d", createArgs)
+		printCommand("k3d", writeArgs)
+		return nil
+	}
+
+	if err := runCommand(r, nil, nil, "docker", "version"); err != nil {
+		return fmt.Errorf("docker daemon check failed: %w", err)
+	}
+	if err := runCommand(r, nil, nil, "k3d", createArgs...); err != nil {
+		return err
+	}
+	if err := os.MkdirAll(filepath.Dir(*kubeconfig), 0o755); err != nil {
+		return err
+	}
+	if err := runCommand(r, nil, nil, "k3d", writeArgs...); err != nil {
+		return err
+	}
+	if err := rewriteK3dKubeconfigHost(*kubeconfig); err != nil {
+		return err
+	}
+	fmt.Println("local k3s kubeconfig:", *kubeconfig)
+	return nil
+}
+
+func deleteLocalK3s(args []string, r runner) error {
+	fs := flag.NewFlagSet("delete", flag.ContinueOnError)
+	fs.SetOutput(os.Stderr)
+	name := fs.String("name", "obs-standard-basic", "k3d cluster name")
+	dryRun := fs.Bool("dry-run", false, "print k3d calls without executing")
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+	if *name == "" {
+		return errors.New("missing required flag: --name")
+	}
+
+	deleteArgs := []string{"cluster", "delete", *name}
+	if *dryRun {
+		printCommand("k3d", deleteArgs)
+		return nil
+	}
+	return runCommand(r, nil, nil, "k3d", deleteArgs...)
+}
+
+func rewriteK3dKubeconfigHost(path string) error {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return err
+	}
+	rendered := strings.ReplaceAll(string(data), "https://host.docker.internal:", "https://127.0.0.1:")
+	return os.WriteFile(path, []byte(rendered), 0o600)
 }
 
 // Usage prints smoke helper usage.
@@ -377,10 +606,15 @@ Usage:
   obsctl smoke ec2-k3s launch --region REGION --ami-id AMI --instance-type TYPE --key-name KEY --subnet-id SUBNET --security-group-id SG [--yes|--dry-run]
   obsctl smoke ec2-k3s fetch-kubeconfig --host HOST --key-path KEY --output PATH [--server-host HOST] [--force]
   obsctl smoke ec2-k3s terminate --region REGION --instance-id ID [--yes|--dry-run]
-  obsctl smoke k3s-basic install --kubeconfig PATH [--namespace monitoring] [--release-name kube-prometheus-stack] [--dry-run]
+  obsctl smoke local-k3s create [--name NAME] [--kubeconfig PATH] [--dry-run]
+  obsctl smoke local-k3s delete [--name NAME] [--dry-run]
+  obsctl smoke k3s-basic install --kubeconfig PATH [--namespace monitoring] [--release-name kube-prometheus-stack] [--grafana-admin-password PASSWORD] [--dry-run]
+  obsctl smoke k3s-phase3 install --kubeconfig PATH [--skip-smoke-workload] [--dry-run]
 
 Safety:
   launch and terminate require --yes for real AWS changes.
+  local-k3s uses k3d and Docker to create a disposable local k3s cluster.
+  k3s-basic creates the Grafana admin Secret with a smoke-only default password.
   use --dry-run to print the AWS CLI calls without executing them.
   fetch-kubeconfig refuses repository-local output unless --allow-repository-output is set.`)
 	return nil
