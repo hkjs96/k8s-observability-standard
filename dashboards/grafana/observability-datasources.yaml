@@ -19,9 +19,11 @@ data:
         uid: tempo
         type: tempo
         access: proxy
-        url: http://tempo.observability-traces.svc.cluster.local:3100
+        url: http://tempo.observability-traces.svc.cluster.local:3200
         isDefault: false
         jsonData:
+          serviceMap:
+            datasourceUid: prometheus
           tracesToLogsV2:
             datasourceUid: loki
             tags:

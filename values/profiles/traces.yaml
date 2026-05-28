@@ -12,6 +12,22 @@ persistence:
 tempo:
   reportingEnabled: false
   retention: 24h
+  metricsGenerator:
+    enabled: true
+    remoteWriteUrl: http://kube-prometheus-stack-prometheus.monitoring:9090/api/v1/write
+    processor:
+      service_graphs: {}
+      span_metrics: {}
+    storage:
+      path: /tmp/tempo/generator/wal
+    traces_storage:
+      path: /tmp/tempo/generator/traces
+  overrides:
+    defaults:
+      metrics_generator:
+        processors:
+          - service-graphs
+          - span-metrics
   receivers:
     otlp:
       protocols:

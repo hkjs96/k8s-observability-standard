@@ -6,6 +6,8 @@ storage, sampling, and exporter choices remain implementation-owned.
 ## Values
 
 - `values/profiles/traces.yaml`: reusable Tempo baseline.
+- `values/profiles/traces-prometheus.yaml`: Prometheus remote-write receiver
+  overlay for the local traces smoke path.
 - `values/overrides/single-cluster-traces.yaml`: fictional single-cluster override.
 - `examples/opentelemetry/traces-instrumentation.yaml`: OpenTelemetry Operator sample.
 
@@ -59,6 +61,10 @@ Use Grafana-managed alerts for trace and dashboard-driven checks. Keep
 platform-critical scrape and component availability alerts in PrometheusRule
 resources.
 
+Tempo datasource provisioning uses the Tempo HTTP API port `3200`. Service
+Graph panels require Tempo metrics-generator plus the Prometheus remote-write
+receiver overlay in `values/profiles/traces-prometheus.yaml`.
+
 ## Smoke Check
 
 Run from an implementation repository after deployment:
@@ -87,6 +93,17 @@ go run ./cmd/obsctl smoke k3s-phase3 install --kubeconfig .tmp/kubeconfig/local-
 
 The smoke dashboard uses the cumulative Tempo span counter so a completed
 short-lived generator job remains visible after the job exits.
+
+TraceQL smoke query:
+
+```traceql
+{resource.service.name="example-phase3-smoke"}
+```
+
+Service Graph smoke evidence should include:
+
+- `traces_service_graph_request_total`
+- `traces_spanmetrics_calls_total`
 
 ## Rollback
 

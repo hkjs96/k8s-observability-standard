@@ -48,11 +48,39 @@ data:
           "id": 3,
           "type": "stat",
           "title": "Received Spans Total",
-          "gridPos": { "x": 0, "y": 8, "w": 24, "h": 8 },
+          "gridPos": { "x": 0, "y": 8, "w": 8, "h": 6 },
           "datasource": { "type": "prometheus", "uid": "prometheus" },
           "targets": [
             {
               "expr": "sum(tempo_distributor_spans_received_total)",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "timeseries",
+          "title": "Service Graph Requests",
+          "gridPos": { "x": 8, "y": 8, "w": 8, "h": 6 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "sum(rate(traces_service_graph_request_total[5m])) by (client, server)",
+              "legendFormat": "{{client}} -> {{server}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "type": "timeseries",
+          "title": "Span Metrics Calls",
+          "gridPos": { "x": 16, "y": 8, "w": 8, "h": 6 },
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "targets": [
+            {
+              "expr": "sum(rate(traces_spanmetrics_calls_total[5m])) by (service, span_kind)",
+              "legendFormat": "{{service}} {{span_kind}}",
               "refId": "A"
             }
           ]

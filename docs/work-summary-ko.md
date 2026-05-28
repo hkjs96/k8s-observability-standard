@@ -275,6 +275,16 @@ Grafana port-forward를 열고 실제 API health와 dashboard 검색을 확인�
   - local k3s에서 확인한 값:
     - `sum(tempo_distributor_spans_received_total)` = `484`
     - `sum(tempo_receiver_accepted_spans)` = `484`
+- Grafana Tempo datasource URL을 Tempo HTTP API 포트인 `3200`으로 수정했습니다.
+- Service Graph 확인을 위해 Tempo metrics-generator와 Prometheus remote-write receiver overlay를 추가했습니다.
+- Grafana Tempo datasource health 확인 결과:
+  - `Data source is working`
+- TraceQL 확인 query:
+  - `{resource.service.name="example-phase3-smoke"}`
+  - Grafana datasource query API에서 trace 5건 반환 확인
+- Service Graph metric 확인 결과:
+  - `traces_service_graph_request_total` = `121`
+  - `traces_spanmetrics_calls_total` = `121`, `121`
 - `examples/phase3-smoke/slo-metrics-generator.yaml`
   - `http_requests_total{slo_service="example-service"}` 샘플 metric을 노출합니다.
   - 기존 SLO recording rule과 새 `SLO Overview` dashboard 확인에 사용합니다.

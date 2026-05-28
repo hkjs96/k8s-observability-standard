@@ -1,0 +1,7 @@
+# Prometheus overlay required by the Phase 3 traces smoke path.
+# It enables the remote write receiver so Tempo metrics-generator can publish
+# service graph and span metrics to the in-cluster Prometheus.
+
+prometheus:
+  prometheusSpec:
+    enableRemoteWriteReceiver: true

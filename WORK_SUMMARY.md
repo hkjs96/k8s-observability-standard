@@ -66,6 +66,7 @@
   - Added Phase 3 smoke workloads for generated logs, generated traces, and example SLO metrics.
   - Added an SLO Overview dashboard for the example availability SLO.
   - Ran the Phase 3 local smoke workload and confirmed Loki query success, Tempo received/accepted spans at 484, and the example SLO ratio at 0.97.
+  - Fixed the Tempo datasource URL to the Tempo HTTP API port 3200, enabled Tempo metrics-generator, enabled the Phase 3 Prometheus remote-write receiver overlay, and confirmed TraceQL plus service graph metrics locally.
   - PrometheusRule samples were applied and updated with the release label required by the installed Prometheus selector.
   - Policy samples passed server-side dry-run validation; PodSecurity baseline warns on node-exporter host namespace/hostPath/hostPort usage, which is expected for the node-exporter daemonset.
 
