@@ -10,6 +10,8 @@ storage, sampling, and exporter choices remain implementation-owned.
   overlay for the local traces smoke path.
 - `values/overrides/single-cluster-traces.yaml`: fictional single-cluster override.
 - `examples/opentelemetry/traces-instrumentation.yaml`: OpenTelemetry Operator sample.
+- `examples/phase3-smoke/example-application.yaml`: local frontend/backend
+  application that exports OTLP traces to Tempo.
 
 The baseline renders Tempo single binary mode with local trace storage so this
 repository can validate manifests without committing object storage details.
@@ -98,6 +100,8 @@ TraceQL smoke query:
 
 ```traceql
 {resource.service.name="example-phase3-smoke"}
+{resource.service.name="example-traced-frontend"}
+{resource.service.name="example-traced-backend"}
 ```
 
 Service Graph smoke evidence should include:

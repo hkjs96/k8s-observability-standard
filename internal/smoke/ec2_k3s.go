@@ -465,6 +465,7 @@ func installK3sPhase3(args []string, r runner) error {
 			[]string{"kubectl", "apply", "-f", "examples/phase3-smoke/namespace.yaml"},
 			[]string{"kubectl", "apply", "-f", "examples/phase3-smoke/log-generator.yaml"},
 			[]string{"kubectl", "apply", "-f", "examples/phase3-smoke/slo-metrics-generator.yaml"},
+			[]string{"kubectl", "apply", "-f", "examples/phase3-smoke/example-application.yaml"},
 			[]string{"kubectl", "-n", "observability-smoke", "delete", "job", "example-trace-generator", "--ignore-not-found=true"},
 			[]string{"kubectl", "apply", "-f", "examples/phase3-smoke/trace-generator.yaml"},
 		)

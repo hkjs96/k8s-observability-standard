@@ -8,6 +8,7 @@ checked in Grafana after Loki, Alloy, and Tempo are installed.
 ```powershell
 kubectl apply -f examples/phase3-smoke/namespace.yaml
 kubectl apply -f examples/phase3-smoke/log-generator.yaml
+kubectl apply -f examples/phase3-smoke/example-application.yaml
 kubectl apply -f examples/phase3-smoke/trace-generator.yaml
 ```
 
@@ -23,6 +24,9 @@ go run ./cmd/obsctl smoke k3s-phase3 install --kubeconfig .tmp/kubeconfig/local-
 - `Logs Error-like Lines Detected` should have Loki data to evaluate.
 - `Traces Overview` should show Tempo request activity and received spans.
 - Grafana Explore should find traces for service `example-phase3-smoke`.
+- Grafana Explore should find application traces for services
+  `example-traced-frontend` and `example-traced-backend`.
+- Service Graph should show traffic between the example frontend and backend.
 
 ## Cleanup
 
