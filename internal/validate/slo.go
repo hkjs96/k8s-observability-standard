@@ -9,6 +9,8 @@ import (
 func SLO(opts Options) error {
 	required := []string{
 		"examples/slo/example-availability.slo.yaml",
+		"examples/phase3-smoke/slo-metrics-generator.yaml",
+		"dashboards/grafana/slo-overview.yaml",
 		"rules/slo/example-availability.yaml",
 		"rules/slo/example-availability.promtool.yaml",
 		"templates/error-budget-review.template.md",
@@ -31,6 +33,7 @@ func SLO(opts Options) error {
 func checkSLOPlaceholders() error {
 	files := []string{
 		"examples/slo/example-availability.slo.yaml",
+		"examples/phase3-smoke/slo-metrics-generator.yaml",
 		"rules/slo/example-availability.yaml",
 		"templates/error-budget-review.template.md",
 	}

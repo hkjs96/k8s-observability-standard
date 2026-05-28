@@ -74,6 +74,18 @@ func run(args []string, r runner) error {
 		default:
 			return fmt.Errorf("unknown smoke k3s-basic command %q", args[1])
 		}
+	case "k3s-phase3":
+		if len(args) < 2 {
+			return Usage()
+		}
+		switch args[1] {
+		case "install":
+			return installK3sPhase3(args[2:], r)
+		case "help", "-h", "--help":
+			return Usage()
+		default:
+			return fmt.Errorf("unknown smoke k3s-phase3 command %q", args[1])
+		}
 	case "local-k3s":
 		if len(args) < 2 {
 			return Usage()
@@ -386,6 +398,114 @@ func installK3sBasic(args []string, r runner) error {
 	return nil
 }
 
+func installK3sPhase3(args []string, r runner) error {
+	fs := flag.NewFlagSet("install", flag.ContinueOnError)
+	fs.SetOutput(os.Stderr)
+	kubeconfig := fs.String("kubeconfig", "", "kubeconfig path")
+	skipValidation := fs.Bool("skip-validation", false, "skip repository strict validation")
+	skipSmokeWorkload := fs.Bool("skip-smoke-workload", false, "skip applying example telemetry workload")
+	dryRun := fs.Bool("dry-run", false, "print commands without executing")
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+	if *kubeconfig == "" {
+		return errors.New("missing required flag: --kubeconfig")
+	}
+	if _, err := os.Stat(*kubeconfig); err != nil {
+		return fmt.Errorf("kubeconfig not found: %s", *kubeconfig)
+	}
+
+	env := []string{"KUBECONFIG=" + *kubeconfig}
+	commands := [][]string{
+		{"kubectl", "create", "namespace", "observability-logs", "--dry-run=client", "-o", "yaml"},
+		{"kubectl", "apply", "-f", "-"},
+		{"kubectl", "create", "namespace", "observability-traces", "--dry-run=client", "-o", "yaml"},
+		{"kubectl", "apply", "-f", "-"},
+		{"helm", "repo", "add", "grafana", "https://grafana.github.io/helm-charts"},
+		{"helm", "repo", "update"},
+		{"helm", "upgrade", "--install", "loki", "grafana/loki",
+			"--version", "7.0.0",
+			"--namespace", "observability-logs",
+			"-f", "values/profiles/logs.yaml",
+			"--wait",
+			"--timeout", "10m"},
+		{"helm", "upgrade", "--install", "alloy", "grafana/alloy",
+			"--version", "1.8.2",
+			"--namespace", "observability-logs",
+			"-f", "values/profiles/logs-alloy.yaml",
+			"--wait",
+			"--timeout", "10m"},
+		{"helm", "upgrade", "--install", "tempo", "grafana/tempo",
+			"--version", "1.24.4",
+			"--namespace", "observability-traces",
+			"-f", "values/profiles/traces.yaml",
+			"--wait",
+			"--timeout", "10m"},
+		{"kubectl", "apply",
+			"-f", "dashboards/grafana/observability-datasources.yaml",
+			"-f", "dashboards/grafana/logs-overview.yaml",
+			"-f", "dashboards/grafana/traces-overview.yaml",
+			"-f", "dashboards/grafana/slo-overview.yaml",
+			"-f", "dashboards/grafana/profile-alerting.yaml",
+			"-f", "dashboards/grafana/profile-notifiers.yaml"},
+	}
+	if !*skipSmokeWorkload {
+		commands = append(commands,
+			[]string{"kubectl", "apply", "-f", "examples/phase3-smoke/namespace.yaml"},
+			[]string{"kubectl", "apply", "-f", "examples/phase3-smoke/log-generator.yaml"},
+			[]string{"kubectl", "apply", "-f", "examples/phase3-smoke/slo-metrics-generator.yaml"},
+			[]string{"kubectl", "-n", "observability-smoke", "delete", "job", "example-trace-generator", "--ignore-not-found=true"},
+			[]string{"kubectl", "apply", "-f", "examples/phase3-smoke/trace-generator.yaml"},
+		)
+	}
+	commands = append(commands,
+		[]string{"kubectl", "-n", "observability-logs", "get", "pods"},
+		[]string{"kubectl", "-n", "observability-traces", "get", "pods"},
+	)
+	if !*skipSmokeWorkload {
+		commands = append(commands, []string{"kubectl", "-n", "observability-smoke", "get", "pods"})
+	}
+
+	if *dryRun {
+		if !*skipValidation {
+			fmt.Println("go run ./cmd/obsctl validate --strict-tools")
+		}
+		for _, command := range commands {
+			printCommand(command[0], command[1:])
+		}
+		return nil
+	}
+
+	if !*skipValidation {
+		if err := validate.Run("all", validate.Options{StrictTools: true}); err != nil {
+			return err
+		}
+	}
+	for i := 0; i < len(commands); i++ {
+		command := commands[i]
+		if len(command) >= 5 && command[0] == "kubectl" && command[1] == "create" && command[2] == "namespace" {
+			out, err := r.RunWithInputEnv(command[0], command[1:], nil, env)
+			if len(out) > 0 {
+				fmt.Print(string(out))
+			}
+			if err != nil {
+				return fmt.Errorf("%s failed: %w", command[0], err)
+			}
+			i++
+			apply := commands[i]
+			if err := runCommand(r, env, out, apply[0], apply[1:]...); err != nil {
+				return err
+			}
+			continue
+		}
+		if err := runCommand(r, env, nil, command[0], command[1:]...); err != nil {
+			return err
+		}
+	}
+	fmt.Println("k3s Phase 3 smoke install ok")
+	return nil
+}
+
 func createLocalK3s(args []string, r runner) error {
 	fs := flag.NewFlagSet("create", flag.ContinueOnError)
 	fs.SetOutput(os.Stderr)
@@ -477,6 +597,7 @@ Usage:
   obsctl smoke local-k3s create [--name NAME] [--kubeconfig PATH] [--dry-run]
   obsctl smoke local-k3s delete [--name NAME] [--dry-run]
   obsctl smoke k3s-basic install --kubeconfig PATH [--namespace monitoring] [--release-name kube-prometheus-stack] [--grafana-admin-password PASSWORD] [--dry-run]
+  obsctl smoke k3s-phase3 install --kubeconfig PATH [--skip-smoke-workload] [--dry-run]
 
 Safety:
   launch and terminate require --yes for real AWS changes.

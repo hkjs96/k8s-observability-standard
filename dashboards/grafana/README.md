@@ -11,6 +11,7 @@ reviewed and sanitized before being copied here.
 - `observability-datasources.yaml` - Loki and Tempo datasource provisioning for profile smoke tests
 - `logs-overview.yaml` - Loki log volume, error-like logs, and recent logs
 - `traces-overview.yaml` - Tempo target health and trace ingestion metrics
+- `slo-overview.yaml` - example availability SLO ratio, request rate, and burn-rate panels
 - `profile-alerting.yaml` - Grafana-managed alert rules for logs/traces profile checks
 - `profile-notifiers.yaml` - example Grafana contact point and notification policy
 

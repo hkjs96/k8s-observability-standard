@@ -63,6 +63,9 @@
   - Added Grafana-managed alert provisioning for logs/traces profile checks.
   - Added Loki and Tempo datasource provisioning plus Logs Overview and Traces Overview dashboards.
   - Installed Loki, Alloy, and Tempo into local k3s and confirmed Grafana sees Loki/Tempo datasources, Logs/Traces dashboards, and two Grafana-managed alert rules.
+  - Added Phase 3 smoke workloads for generated logs, generated traces, and example SLO metrics.
+  - Added an SLO Overview dashboard for the example availability SLO.
+  - Ran the Phase 3 local smoke workload and confirmed Loki query success, Tempo received/accepted spans at 484, and the example SLO ratio at 0.97.
   - PrometheusRule samples were applied and updated with the release label required by the installed Prometheus selector.
   - Policy samples passed server-side dry-run validation; PodSecurity baseline warns on node-exporter host namespace/hostPath/hostPort usage, which is expected for the node-exporter daemonset.
 

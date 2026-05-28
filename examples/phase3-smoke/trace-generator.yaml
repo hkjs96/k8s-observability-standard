@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: example-trace-generator
+  namespace: observability-smoke
+  labels:
+    app.kubernetes.io/name: example-trace-generator
+    app.kubernetes.io/component: smoke
+spec:
+  backoffLimit: 2
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: example-trace-generator
+        app.kubernetes.io/component: smoke
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: telemetrygen
+          image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - traces
+            - --otlp-endpoint=tempo.observability-traces.svc.cluster.local:4317
+            - --otlp-insecure
+            - --service=example-phase3-smoke
+            - --duration=2m
+            - --rate=2
+            - --workers=1
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65534
+            seccompProfile:
+              type: RuntimeDefault

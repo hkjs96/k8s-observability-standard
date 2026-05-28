@@ -76,6 +76,12 @@ Evidence to collect:
 - Query latency is acceptable for the selected retention and storage mode.
 - No high-cardinality labels appear in the Loki label browser.
 
+For local k3s smoke, apply `examples/phase3-smoke/log-generator.yaml` or run:
+
+```powershell
+go run ./cmd/obsctl smoke k3s-phase3 install --kubeconfig .tmp/kubeconfig/local-k3s.yaml
+```
+
 ## Rollback
 
 Rollback is implementation-owned. At minimum:

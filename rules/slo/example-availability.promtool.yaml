@@ -3,9 +3,9 @@ groups:
     rules:
       - record: slo:example_service_availability:ratio_rate5m
         expr: |
-          sum(rate(http_requests_total{service="example-service",code!~"5.."}[5m]))
+          sum(rate(http_requests_total{slo_service="example-service",code!~"5.."}[5m]))
           /
-          sum(rate(http_requests_total{service="example-service"}[5m]))
+          sum(rate(http_requests_total{slo_service="example-service"}[5m]))
       - alert: ExampleServiceAvailabilitySLOBurnRateHigh
         expr: |
           (1 - slo:example_service_availability:ratio_rate5m) > (14.4 * (1 - 0.999))

@@ -8,8 +8,8 @@ spec:
   window: 30d
   sli:
     type: availability
-    goodEvents: sum(rate(http_requests_total{service="example-service",code!~"5.."}[5m]))
-    totalEvents: sum(rate(http_requests_total{service="example-service"}[5m]))
+    goodEvents: sum(rate(http_requests_total{slo_service="example-service",code!~"5.."}[5m]))
+    totalEvents: sum(rate(http_requests_total{slo_service="example-service"}[5m]))
   alerting:
     pageSeverity: page
     ticketSeverity: warning

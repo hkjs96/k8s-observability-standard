@@ -35,6 +35,16 @@ Use `templates/error-budget-review.template.md` during handover and after major
 incidents. Implementation repositories must fill in real owners, service names,
 budget state, and decisions.
 
+## Grafana UI
+
+The example SLO dashboard is managed through Grafana provisioning:
+
+- `dashboards/grafana/slo-overview.yaml`
+
+For local k3s smoke, `examples/phase3-smoke/slo-metrics-generator.yaml` exposes
+fictional `http_requests_total{slo_service="example-service"}` metrics so the
+example SLO recording rule and dashboard can show data.
+
 ## Rollback
 
 Rollback is implementation-owned. At minimum:

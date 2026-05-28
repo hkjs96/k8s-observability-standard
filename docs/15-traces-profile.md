@@ -77,6 +77,17 @@ Evidence to collect:
 - A smoke trace can be found in Grafana.
 - Trace-to-logs links use low-cardinality labels.
 
+`Traces Overview` panels only show meaningful values after an application or
+smoke workload sends spans. For local k3s smoke, apply
+`examples/phase3-smoke/trace-generator.yaml` or run:
+
+```powershell
+go run ./cmd/obsctl smoke k3s-phase3 install --kubeconfig .tmp/kubeconfig/local-k3s.yaml
+```
+
+The smoke dashboard uses the cumulative Tempo span counter so a completed
+short-lived generator job remains visible after the job exits.
+
 ## Rollback
 
 Rollback is implementation-owned. At minimum:

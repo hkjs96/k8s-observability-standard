@@ -46,13 +46,13 @@ data:
         },
         {
           "id": 3,
-          "type": "timeseries",
-          "title": "Received Spans",
+          "type": "stat",
+          "title": "Received Spans Total",
           "gridPos": { "x": 0, "y": 8, "w": 24, "h": 8 },
           "datasource": { "type": "prometheus", "uid": "prometheus" },
           "targets": [
             {
-              "expr": "sum(rate(tempo_distributor_spans_received_total[5m]))",
+              "expr": "sum(tempo_distributor_spans_received_total)",
               "refId": "A"
             }
           ]

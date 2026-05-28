@@ -53,6 +53,7 @@ func checkTracePlaceholders() error {
 		"values/profiles/traces.yaml",
 		"values/overrides/single-cluster-traces.yaml",
 		"examples/opentelemetry/traces-instrumentation.yaml",
+		"examples/phase3-smoke/trace-generator.yaml",
 	}
 	forbidden := []string{
 		"api.honeycomb.io",
