@@ -19,10 +19,15 @@ func Basic(opts Options) error {
 		return nil
 	}
 
+	version, err := lockedChartVersion(kubePrometheusStack)
+	if err != nil {
+		return err
+	}
+
 	templateArgs := []string{
 		"template", "kube-prometheus-stack", "kube-prometheus-stack",
 		"--repo", "https://prometheus-community.github.io/helm-charts",
-		"--version", "85.0.2",
+		"--version", version,
 		"--namespace", "monitoring",
 		"-f", "values/common/kube-prometheus-stack.yaml",
 		"-f", "values/profiles/basic.yaml",
@@ -51,7 +56,7 @@ func Basic(opts Options) error {
 	pullArgs := []string{
 		"pull", "kube-prometheus-stack",
 		"--repo", "https://prometheus-community.github.io/helm-charts",
-		"--version", "85.0.2",
+		"--version", version,
 		"--untar",
 		"--untardir", lintDir,
 	}
@@ -91,10 +96,6 @@ func findHelm() (string, error) {
 	if _, err := os.Stat(localTmpExe); err == nil {
 		return localTmpExe, nil
 	}
-	local := filepath.Join("..", "lgtm-k8s-observability-v2", "tools", "bin", "helm.exe")
-	if _, err := os.Stat(local); err == nil {
-		return local, nil
-	}
 	return "", fmt.Errorf("helm not found")
 }
 
@@ -102,7 +103,6 @@ func findKubeconform() (string, error) {
 	candidates := []string{
 		filepath.Join(".tmp", "tools", "kubeconform.exe"),
 		filepath.Join(".tmp", "tools", "kubeconform"),
-		filepath.Join("..", "lgtm-k8s-observability-v2", "tools", "bin", "kubeconform.exe"),
 	}
 
 	for _, candidate := range candidates {

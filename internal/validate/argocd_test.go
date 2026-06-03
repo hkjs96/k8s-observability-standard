@@ -8,7 +8,7 @@ import (
 
 func TestArgoCDRejectsWildcardSourceRepos(t *testing.T) {
 	withWorkDir(t, func(root string) {
-		writeFile(t, root, "argocd/projects/project.yaml", "source"+"Repos: ['*']\n")
+		writeFile(t, root, "argocd/projects/project.yaml", "sourceRepos: ['*']\n")
 
 		err := ArgoCD()
 		if err == nil {

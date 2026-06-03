@@ -18,9 +18,14 @@ func Traces(opts Options) error {
 		return checkTracePlaceholders()
 	}
 
+	version, err := lockedChartVersion("tempo")
+	if err != nil {
+		return err
+	}
+
 	args := []string{
 		"template", "tempo", "grafana/tempo",
-		"--version", "1.24.4",
+		"--version", version,
 		"--namespace", "observability-traces",
 		"-f", "values/profiles/traces.yaml",
 	}
@@ -60,7 +65,7 @@ func checkTracePlaceholders() error {
 	forbidden := []string{
 		"api.honeycomb.io",
 		"ingest.",
-		"arn:" + "aws",
+		"arn:aws",
 		"tempo-chunks",
 		"trace-tenant",
 		"tenant_id",

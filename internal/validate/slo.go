@@ -3,8 +3,13 @@ package validate
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 )
+
+// sloEscalationContact matches committed escalation contacts (email addresses)
+// that belong in an implementation repository, not in the standard SLO samples.
+var sloEscalationContact = regexp.MustCompile(`[\w.+-]+@[\w-]+\.[\w.-]+`)
 
 func SLO(opts Options) error {
 	required := []string{
@@ -40,8 +45,8 @@ func checkSLOPlaceholders() error {
 	forbidden := []string{
 		"pagerduty",
 		"slack.com",
-		"@",
-		"arn:" + "aws",
+		"opsgenie",
+		"arn:aws",
 	}
 	var hits []string
 	for _, file := range files {
@@ -49,10 +54,15 @@ func checkSLOPlaceholders() error {
 		if err != nil {
 			return err
 		}
+		text := string(data)
+		lower := strings.ToLower(text)
 		for _, token := range forbidden {
-			if strings.Contains(strings.ToLower(string(data)), token) {
+			if strings.Contains(lower, token) {
 				hits = append(hits, fmt.Sprintf("%s contains implementation-owned SLO value %q", file, token))
 			}
+		}
+		if contact := sloEscalationContact.FindString(text); contact != "" {
+			hits = append(hits, fmt.Sprintf("%s contains implementation-owned escalation contact %q", file, contact))
 		}
 	}
 	if len(hits) > 0 {

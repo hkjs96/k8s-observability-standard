@@ -27,7 +27,7 @@ Excludes:
 
 Purpose: add centralized log storage and query.
 
-Includes later:
+Includes:
 
 - Loki backend
 - Alloy logs collector
@@ -39,7 +39,7 @@ Includes later:
 
 Purpose: add distributed tracing and trace-to-logs workflows.
 
-Includes later:
+Includes:
 
 - Tempo backend
 - OTLP receiver service
@@ -50,12 +50,17 @@ Includes later:
 
 Purpose: define SLO-as-code workflows and error budget operations.
 
-Includes later:
+Includes:
+
+- availability SLO sample and source spec
+- generated-style PrometheusRule sample with promtool mirror
+- generated PrometheusRule review flow
+- error budget review template
+
+Pending decision (out of scope until chosen):
 
 - Sloth validation and rule generation
-- availability and latency SLO samples
-- generated PrometheusRule review flow
-- Pyrra decision criteria if a dedicated SLO UI is required
+- Pyrra if a dedicated SLO UI is required
 
 ## Optional
 

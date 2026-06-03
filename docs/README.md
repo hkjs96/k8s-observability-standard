@@ -11,13 +11,14 @@ Use these documents for:
 - security governance explanations
 - validation contract and CI provider guidance
 - Phase 0-2 completion status and known limits
+- Phase 3 logs, traces, and SLO profile guidance
 
 Do not use `docs/` as the primary source for mandatory agent execution rules.
 Agent rules, workflows, checks, and path routing live in `.agent/`.
 
 ## Index
 
-- `00-overview.md`: repository purpose, boundary, and Phase 0-2 outcome
+- `00-overview.md`: repository purpose, boundary, Phase 0-2 outcome, and Phase 3 profiles
 - `01-standard-decisions.md`: selected tools and deferred decisions
 - `02-profiles.md`: profile boundaries
 - `03-customization-guide.md`: values layering and implementation overrides
@@ -35,4 +36,5 @@ Agent rules, workflows, checks, and path routing live in `.agent/`.
 - `15-traces-profile.md`: Traces profile values, OTLP guidance, smoke checks, and rollback notes
 - `16-slo-profile.md`: SLO workflow, generated rule validation, and error budget review
 - `17-local-k3d-smoke.md`: local Docker-based k3s smoke test using k3d
+- `work-summary.md`: work and validation result summary (English)
 - `work-summary-ko.md`: 한국어 작업 및 검증 결과 요약

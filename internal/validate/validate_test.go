@@ -17,7 +17,7 @@ func TestSelectChecksAllTargets(t *testing.T) {
 		names = append(names, check.Name)
 	}
 
-	want := []string{"yaml", "basic", "logs", "traces", "slo", "argocd", "prometheus", "sensitive"}
+	want := []string{"yaml", "charts", "basic", "logs", "traces", "slo", "argocd", "prometheus", "sensitive"}
 	if !reflect.DeepEqual(names, want) {
 		t.Fatalf("selectChecks(\"\") = %v, want %v", names, want)
 	}
