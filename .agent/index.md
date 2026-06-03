@@ -25,6 +25,7 @@ required `.agent/` files are read.
 | --- | --- |
 | `values/**` | `.agent/rules/profiles.md`, `.agent/workflows/update-values.md`, `.agent/checks/basic-validation.md` |
 | `argocd/**` | `.agent/rules/argocd.md`, `.agent/workflows/update-argocd-app.md`, `.agent/checks/argocd-validation.md` |
+| `charts-lock/**` | `.agent/rules/profiles.md`; run `go run ./cmd/obsctl validate charts` then `go run ./cmd/obsctl validate` (a version bump affects every render). |
 | `rules/**` | `.agent/workflows/add-prometheus-rule.md`, `.agent/checks/prometheus-rule-validation.md` |
 | `dashboards/**` | `.agent/workflows/add-dashboard.md`, `.agent/checks/sensitive-values.md` |
 | `policies/**` | `.agent/rules/repository-boundary.md`, `.agent/checks/basic-validation.md` |

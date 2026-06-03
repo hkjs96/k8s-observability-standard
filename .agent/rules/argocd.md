@@ -6,6 +6,7 @@ applies_to:
   - "argocd/**"
 checks:
   - go run ./cmd/obsctl validate argocd
+  - go run ./cmd/obsctl validate charts
   - go run ./cmd/obsctl validate sensitive
 ---
 
@@ -18,3 +19,5 @@ checks:
 - Prefer Helm `valueFiles` over inline `values` or `valuesObject`.
 - Use Argo CD multiple sources when combining an upstream chart with Git-hosted values.
 - Keep sync waves explicit for namespace and core platform resources.
+- Keep each Helm `targetRevision` equal to the pinned version in
+  `charts-lock/chart-versions.yaml`; `obsctl validate charts` enforces this.
