@@ -21,9 +21,12 @@ task.
 permissions must account for Prometheus Operator CRDs, ClusterRoles, and
 webhooks, while still avoiding broad wildcard access.
 
-The sample namespace uses `baseline` enforcement and `restricted` audit/warn
-labels. Tighten this only after checking node exporter and operator behavior in
-the target cluster.
+The sample namespace uses `privileged` enforcement with `restricted` audit/warn
+labels. node-exporter requires host namespaces (`hostNetwork`/`hostPID`) and
+hostPath volumes, which `baseline` and `restricted` deny, so a stricter enforced
+level would block node-exporter at admission and drop node metrics. audit/warn
+stay at `restricted` for visibility. See `policies/README.md` before changing the
+enforced level (for example after isolating node-exporter).
 
 ## HostPath Policy
 
