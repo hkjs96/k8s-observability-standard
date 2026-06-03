@@ -18,7 +18,7 @@ func Traces(opts Options) error {
 		return checkTracePlaceholders()
 	}
 
-	version, err := lockedChartVersion("tempo")
+	version, err := LockedChartVersion("tempo")
 	if err != nil {
 		return err
 	}

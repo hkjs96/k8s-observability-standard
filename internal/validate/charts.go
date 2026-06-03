@@ -50,9 +50,10 @@ func chartVersions() (map[string]string, error) {
 	return versions, nil
 }
 
-// requireChartVersions loads the chart lock and errors if any of the named
-// charts is missing a pinned version.
-func requireChartVersions(names ...string) (map[string]string, error) {
+// RequireChartVersions loads the chart lock and errors if any of the named
+// charts is missing a pinned version. charts-lock is the single source of truth
+// for chart versions, shared by the validators and the smoke installers.
+func RequireChartVersions(names ...string) (map[string]string, error) {
 	versions, err := chartVersions()
 	if err != nil {
 		return nil, err
@@ -65,10 +66,10 @@ func requireChartVersions(names ...string) (map[string]string, error) {
 	return versions, nil
 }
 
-// lockedChartVersion returns the pinned version for a single chart, or an error
+// LockedChartVersion returns the pinned version for a single chart, or an error
 // if charts-lock does not pin it.
-func lockedChartVersion(name string) (string, error) {
-	versions, err := requireChartVersions(name)
+func LockedChartVersion(name string) (string, error) {
+	versions, err := RequireChartVersions(name)
 	if err != nil {
 		return "", err
 	}
@@ -80,7 +81,7 @@ func lockedChartVersion(name string) (string, error) {
 // Application must reference the same kube-prometheus-stack version so the
 // validated render and the deployed render cannot drift apart.
 func Charts() error {
-	versions, err := requireChartVersions(kubePrometheusStack, "loki", "alloy", "tempo")
+	versions, err := RequireChartVersions(kubePrometheusStack, "loki", "alloy", "tempo")
 	if err != nil {
 		return err
 	}

@@ -17,7 +17,7 @@ func Logs(opts Options) error {
 		return checkLogLabelCardinality()
 	}
 
-	versions, err := requireChartVersions("loki", "alloy")
+	versions, err := RequireChartVersions("loki", "alloy")
 	if err != nil {
 		return err
 	}

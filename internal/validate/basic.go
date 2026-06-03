@@ -19,7 +19,7 @@ func Basic(opts Options) error {
 		return nil
 	}
 
-	version, err := lockedChartVersion(kubePrometheusStack)
+	version, err := LockedChartVersion(kubePrometheusStack)
 	if err != nil {
 		return err
 	}

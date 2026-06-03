@@ -332,13 +332,18 @@ func installK3sBasic(args []string, r runner) error {
 		return fmt.Errorf("kubeconfig not found: %s", *kubeconfig)
 	}
 
+	kpsVersion, err := validate.LockedChartVersion("kube-prometheus-stack")
+	if err != nil {
+		return err
+	}
+
 	env := []string{"KUBECONFIG=" + *kubeconfig}
 	commands := [][]string{
 		{"kubectl", "get", "nodes"},
 		{"helm", "repo", "add", "prometheus-community", "https://prometheus-community.github.io/helm-charts"},
 		{"helm", "repo", "update"},
 		{"helm", "upgrade", "--install", *releaseName, "prometheus-community/kube-prometheus-stack",
-			"--version", "85.0.2",
+			"--version", kpsVersion,
 			"--namespace", *namespace,
 			"-f", "values/common/kube-prometheus-stack.yaml",
 			"-f", "values/profiles/basic.yaml",
@@ -415,6 +420,11 @@ func installK3sPhase3(args []string, r runner) error {
 		return fmt.Errorf("kubeconfig not found: %s", *kubeconfig)
 	}
 
+	versions, err := validate.RequireChartVersions("kube-prometheus-stack", "loki", "alloy", "tempo")
+	if err != nil {
+		return err
+	}
+
 	env := []string{"KUBECONFIG=" + *kubeconfig}
 	commands := [][]string{
 		{"kubectl", "create", "namespace", "observability-logs", "--dry-run=client", "-o", "yaml"},
@@ -425,7 +435,7 @@ func installK3sPhase3(args []string, r runner) error {
 		{"helm", "repo", "add", "grafana", "https://grafana.github.io/helm-charts"},
 		{"helm", "repo", "update"},
 		{"helm", "upgrade", "--install", "kube-prometheus-stack", "prometheus-community/kube-prometheus-stack",
-			"--version", "85.0.2",
+			"--version", versions["kube-prometheus-stack"],
 			"--namespace", "monitoring",
 			"-f", "values/common/kube-prometheus-stack.yaml",
 			"-f", "values/profiles/basic.yaml",
@@ -435,19 +445,19 @@ func installK3sPhase3(args []string, r runner) error {
 			"--wait",
 			"--timeout", "15m"},
 		{"helm", "upgrade", "--install", "loki", "grafana/loki",
-			"--version", "7.0.0",
+			"--version", versions["loki"],
 			"--namespace", "observability-logs",
 			"-f", "values/profiles/logs.yaml",
 			"--wait",
 			"--timeout", "10m"},
 		{"helm", "upgrade", "--install", "alloy", "grafana/alloy",
-			"--version", "1.8.2",
+			"--version", versions["alloy"],
 			"--namespace", "observability-logs",
 			"-f", "values/profiles/logs-alloy.yaml",
 			"--wait",
 			"--timeout", "10m"},
 		{"helm", "upgrade", "--install", "tempo", "grafana/tempo",
-			"--version", "1.24.4",
+			"--version", versions["tempo"],
 			"--namespace", "observability-traces",
 			"-f", "values/profiles/traces.yaml",
 			"--wait",

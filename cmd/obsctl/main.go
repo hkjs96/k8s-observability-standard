@@ -71,6 +71,7 @@ Usage:
   obsctl validate [--strict-tools] [all|basic|yaml|charts|sensitive|argocd|prometheus]
   obsctl validate profile [basic|logs|traces|slo] [--strict-tools]
   obsctl smoke ec2-k3s [launch|fetch-kubeconfig|terminate] [options]
+  obsctl smoke local-k3s [create|delete] [options]
   obsctl smoke k3s-basic install [options]
   obsctl smoke k3s-phase3 install [options]
 
