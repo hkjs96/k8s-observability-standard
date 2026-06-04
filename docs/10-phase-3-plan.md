@@ -3,6 +3,14 @@
 Phase 3 expands beyond the Basic metrics baseline. The work should remain split
 by profile so logs, tracing, and SLO features can be adopted independently.
 
+> **Status:** The Standard Logs, Advanced Traces, and SLO profiles described
+> below are now implemented and validation-ready — see `docs/14-logs-profile.md`,
+> `docs/15-traces-profile.md`, and `docs/16-slo-profile.md`. This document is
+> kept as the original plan and the record of still-open decisions. Notably,
+> Sloth vs Pyrra for SLO generation remains deferred: the shipped SLO sample is a
+> hand-written generated-style PrometheusRule (page and warning burn-rate
+> alerts), not Sloth output.
+
 ## Scope Principles
 
 - Keep Basic metrics stable while adding new profiles.
