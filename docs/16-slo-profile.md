@@ -11,6 +11,16 @@ notification routes remain implementation-owned.
 - `rules/slo/example-availability.promtool.yaml`: promtool mirror.
 - `templates/error-budget-review.template.md`: handover and review template.
 
+## Burn-rate alerts
+
+The generated rule sample implements both severities declared in the SLO spec
+(`alerting.pageSeverity` and `alerting.ticketSeverity`):
+
+- `ExampleServiceAvailabilitySLOBurnRateHigh` (page): fast burn on the 5m ratio.
+- `ExampleServiceAvailabilitySLOBurnRateWarning` (warning, ticket): slow burn on
+  the 1h ratio at a lower multiplier, so it catches sustained budget loss that
+  the page threshold misses.
+
 ## Workflow
 
 1. Keep human-authored SLO specs in an implementation repository.
