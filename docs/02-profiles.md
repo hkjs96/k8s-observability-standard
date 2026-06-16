@@ -57,15 +57,17 @@ Includes:
 - generated PrometheusRule review flow
 - error budget review template
 
-Pending decision (out of scope until chosen):
+Generator decision (planned in `docs/18-phase-4-plan.md`):
 
-- Sloth validation and rule generation
-- Pyrra if a dedicated SLO UI is required
+- Sloth is the standardized SLO-as-code generator; the Sloth pipeline itself is
+  Phase 4 work.
+- Pyrra stays an optional SLO UI evaluated in Phase 4.
 
 ## Optional
 
 Optional capabilities are evaluated only when implementation requirements justify
-their cost and operational complexity:
+their cost and operational complexity. These are planned in
+`docs/18-phase-4-plan.md`:
 
 - Mimir for central or long-term metrics
 - Perses for dashboard-as-code PoC

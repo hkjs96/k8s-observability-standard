@@ -3,6 +3,7 @@ id: phase-3-profile-validation
 type: check
 applies_to:
   - "docs/10-phase-3-plan.md"
+  - "docs/18-phase-4-plan.md"
   - "values/**"
   - "rules/**"
   - "dashboards/**"

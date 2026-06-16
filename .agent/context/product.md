@@ -21,10 +21,12 @@ Implemented scope:
 - Argo CD templates using pinned chart versions and Git-hosted values
 - Go validation CLI (`cmd/obsctl`) and templates
 
-Still out of scope unless a task explicitly expands it:
+Still out of scope unless a task explicitly expands it (roadmap in
+`docs/18-phase-4-plan.md`):
 
 - Mimir for central or long-term metrics
-- Sloth or Pyrra as the standardized SLO generator or UI
+- The Sloth generation pipeline and Pyrra as a dedicated SLO UI (Sloth is the
+  chosen generator; the pipeline itself is not yet implemented)
 - Perses dashboard-as-code
 - eBPF or profiling collectors and other optional UIs
 
