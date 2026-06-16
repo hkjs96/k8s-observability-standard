@@ -61,5 +61,6 @@ Phase 3 adds reusable, validation-ready baselines layered on top of Basic:
 - SLO: SLO-as-code samples and error budget review workflow
   (`docs/16-slo-profile.md`)
 
-Mimir, Sloth, Pyrra, Perses, and profiling collectors remain optional and out of
-scope until a task explicitly expands it.
+Mimir, the Sloth generation pipeline, Pyrra, Perses, and profiling collectors
+remain optional and out of scope until a task explicitly expands it. The roadmap
+for these is in `docs/18-phase-4-plan.md`.
