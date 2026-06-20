@@ -69,6 +69,7 @@ Acceptance criteria:
 
 - Values avoid real endpoints and tenant identifiers.
 - Trace components render with kubeconform where schemas are available.
+- `obsctl validate --strict-tools` remains green.
 
 ### Task: Add Trace-To-Logs Guidance
 
@@ -108,9 +109,9 @@ Goal: define SLO-as-code source and generated rule flow.
 
 Deliverables:
 
-- SLO spec location proposal
-- generated PrometheusRule location proposal
-- Sloth generation command documentation
+- `examples/slo/` source SLO spec location
+- `rules/slo/` generated PrometheusRule location
+- generation workflow documentation
 
 Acceptance criteria:
 
@@ -124,8 +125,8 @@ Goal: validate generated SLO alert rules.
 Deliverables:
 
 - promtool validation for generated rules
-- SLO linting plan
-- example availability and latency SLOs
+- SLO placeholder checks
+- example availability SLO
 
 Acceptance criteria:
 

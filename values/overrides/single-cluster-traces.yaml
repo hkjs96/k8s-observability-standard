@@ -1,0 +1,9 @@
+# Fictional single-cluster traces override.
+# Implementation repositories must replace retention and storage choices for real workloads.
+
+persistence:
+  enabled: true
+  size: 20Gi
+
+tempo:
+  retention: 48h

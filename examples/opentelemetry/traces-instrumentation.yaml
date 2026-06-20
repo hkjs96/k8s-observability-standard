@@ -1,0 +1,16 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: example-traces
+  namespace: example-namespace
+spec:
+  exporter:
+    endpoint: http://tempo.observability-traces.svc.cluster.local:4317
+  propagators:
+    - tracecontext
+    - baggage
+  sampler:
+    type: parentbased_traceidratio
+    argument: "0.10"
+  resource:
+    addK8sUIDAttributes: false

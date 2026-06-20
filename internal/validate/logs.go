@@ -17,14 +17,19 @@ func Logs(opts Options) error {
 		return checkLogLabelCardinality()
 	}
 
+	versions, err := RequireChartVersions("loki", "alloy")
+	if err != nil {
+		return err
+	}
+
 	renders := []struct {
 		name    string
 		chart   string
 		version string
 		values  string
 	}{
-		{name: "loki", chart: "grafana/loki", version: "7.0.0", values: "values/profiles/logs.yaml"},
-		{name: "alloy", chart: "grafana/alloy", version: "1.8.2", values: "values/profiles/logs-alloy.yaml"},
+		{name: "loki", chart: "grafana/loki", version: versions["loki"], values: "values/profiles/logs.yaml"},
+		{name: "alloy", chart: "grafana/alloy", version: versions["alloy"], values: "values/profiles/logs-alloy.yaml"},
 	}
 
 	for _, render := range renders {
@@ -60,6 +65,7 @@ func checkLogLabelCardinality() error {
 	files := []string{
 		"values/profiles/logs.yaml",
 		"values/profiles/logs-alloy.yaml",
+		"examples/phase3-smoke/log-generator.yaml",
 	}
 	forbidden := []string{
 		"__meta_kubernetes_pod_uid",

@@ -47,6 +47,18 @@ go run ./cmd/obsctl validate --strict-tools
 The logs validator renders Loki and Alloy, runs kubeconform on rendered
 manifests, and rejects high-cardinality log label sources.
 
+## Grafana UI
+
+Logs profile UI is managed through Grafana provisioning:
+
+- `dashboards/grafana/observability-datasources.yaml`
+- `dashboards/grafana/logs-overview.yaml`
+- `dashboards/grafana/profile-alerting.yaml`
+
+Use Grafana-managed alerts for dashboard-driven log conditions such as
+error-like log lines. Keep platform-critical scrape and component availability
+alerts in PrometheusRule resources.
+
 ## Smoke Queries
 
 Run from an implementation repository after deployment:
@@ -63,6 +75,12 @@ Evidence to collect:
 - Recent logs exist for the target namespace.
 - Query latency is acceptable for the selected retention and storage mode.
 - No high-cardinality labels appear in the Loki label browser.
+
+For local k3s smoke, apply `examples/phase3-smoke/log-generator.yaml` or run:
+
+```powershell
+go run ./cmd/obsctl smoke k3s-phase3 install --kubeconfig .tmp/kubeconfig/local-k3s.yaml
+```
 
 ## Rollback
 

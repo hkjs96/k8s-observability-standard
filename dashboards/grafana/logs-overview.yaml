@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-logs-overview
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+  annotations:
+    grafana_folder: Observability Profiles
+data:
+  logs-overview.json: |
+    {
+      "title": "Logs Overview",
+      "uid": "logs-overview",
+      "schemaVersion": 36,
+      "version": 1,
+      "refresh": "30s",
+      "time": { "from": "now-1h", "to": "now" },
+      "panels": [
+        {
+          "id": 1,
+          "type": "timeseries",
+          "title": "Log Lines by Namespace",
+          "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+          "datasource": { "type": "loki", "uid": "loki" },
+          "targets": [
+            {
+              "expr": "sum by (namespace) (count_over_time({namespace=~\".+\"}[$__interval]))",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "type": "timeseries",
+          "title": "Error-like Log Lines",
+          "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+          "datasource": { "type": "loki", "uid": "loki" },
+          "targets": [
+            {
+              "expr": "sum by (namespace) (count_over_time({namespace=~\".+\"} |~ \"(?i)(error|exception|fail)\" [$__interval]))",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "type": "logs",
+          "title": "Recent Logs",
+          "gridPos": { "x": 0, "y": 8, "w": 24, "h": 10 },
+          "datasource": { "type": "loki", "uid": "loki" },
+          "targets": [
+            {
+              "expr": "{namespace=~\".+\"}",
+              "refId": "A"
+            }
+          ]
+        }
+      ]
+    }

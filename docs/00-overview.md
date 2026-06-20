@@ -50,3 +50,17 @@ Phase 0-2 produces a usable Basic profile baseline:
 - Grafana dashboard sidecar convention
 - PrometheusRule, ServiceMonitor, and PodMonitor ownership guidance
 - Argo CD project and application templates using pinned chart versions
+
+## Phase 3 Profiles
+
+Phase 3 adds reusable, validation-ready baselines layered on top of Basic:
+
+- Standard Logs: Loki backend and Alloy log collector (`docs/14-logs-profile.md`)
+- Advanced Traces: Tempo backend and OpenTelemetry instrumentation samples
+  (`docs/15-traces-profile.md`)
+- SLO: SLO-as-code samples and error budget review workflow
+  (`docs/16-slo-profile.md`)
+
+Mimir, the Sloth generation pipeline, Pyrra, Perses, and profiling collectors
+remain optional and out of scope until a task explicitly expands it. The roadmap
+for these is in `docs/18-phase-4-plan.md`.

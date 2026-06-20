@@ -9,8 +9,8 @@ import (
 
 func TestSensitiveValuesSkipsIgnoredWorkDirs(t *testing.T) {
 	withWorkDir(t, func(root string) {
-		writeFile(t, root, ".tmp/tools/prometheus.exe", "AccessKeyID "+"SECRET"+"_KEY")
-		writeFile(t, root, ".cache/build/output.txt", "admin"+"Password")
+		writeFile(t, root, ".tmp/tools/prometheus.exe", "AccessKeyID SECRET_KEY")
+		writeFile(t, root, ".cache/build/output.txt", "adminPassword")
 		writeFile(t, root, "values/profiles/basic.yaml", "cluster: example-cluster\n")
 
 		if err := SensitiveValues(); err != nil {
@@ -21,7 +21,7 @@ func TestSensitiveValuesSkipsIgnoredWorkDirs(t *testing.T) {
 
 func TestSensitiveValuesRejectsForbiddenPattern(t *testing.T) {
 	withWorkDir(t, func(root string) {
-		writeFile(t, root, "values/profiles/basic.yaml", "admin"+"Password: admin"+"123\n")
+		writeFile(t, root, "values/profiles/basic.yaml", "adminPassword: admin123\n")
 
 		err := SensitiveValues()
 		if err == nil {
@@ -35,7 +35,7 @@ func TestSensitiveValuesRejectsForbiddenPattern(t *testing.T) {
 
 func TestSensitiveValuesRejectsCustomersOutsideAllowedDocs(t *testing.T) {
 	withWorkDir(t, func(root string) {
-		writeFile(t, root, "docs/01-standard-decisions.md", "Use customers"+"/ here.\n")
+		writeFile(t, root, "docs/01-standard-decisions.md", "Use customers/ here.\n")
 
 		err := SensitiveValues()
 		if err == nil {
@@ -49,13 +49,13 @@ func TestSensitiveValuesRejectsCustomersOutsideAllowedDocs(t *testing.T) {
 
 func TestSensitiveValuesRejectsArgoWildcardPattern(t *testing.T) {
 	withWorkDir(t, func(root string) {
-		writeFile(t, root, "argocd/projects/project.yaml", "source"+"Repos: ['*']\n")
+		writeFile(t, root, "argocd/projects/project.yaml", "sourceRepos: ['*']\n")
 
 		err := SensitiveValues()
 		if err == nil {
 			t.Fatal("SensitiveValues() error = nil, want wildcard error")
 		}
-		if !strings.Contains(err.Error(), "source"+"Repos") {
+		if !strings.Contains(err.Error(), "sourceRepos") {
 			t.Fatalf("SensitiveValues() error = %v, want sourceRepos detail", err)
 		}
 	})

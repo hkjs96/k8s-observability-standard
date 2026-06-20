@@ -27,7 +27,7 @@ Excludes:
 
 Purpose: add centralized log storage and query.
 
-Includes later:
+Includes:
 
 - Loki backend
 - Alloy logs collector
@@ -39,7 +39,7 @@ Includes later:
 
 Purpose: add distributed tracing and trace-to-logs workflows.
 
-Includes later:
+Includes:
 
 - Tempo backend
 - OTLP receiver service
@@ -50,17 +50,24 @@ Includes later:
 
 Purpose: define SLO-as-code workflows and error budget operations.
 
-Includes later:
+Includes:
 
-- Sloth validation and rule generation
-- availability and latency SLO samples
+- availability SLO sample and source spec
+- generated-style PrometheusRule sample with promtool mirror
 - generated PrometheusRule review flow
-- Pyrra decision criteria if a dedicated SLO UI is required
+- error budget review template
+
+Generator decision (planned in `docs/18-phase-4-plan.md`):
+
+- Sloth is the standardized SLO-as-code generator; the Sloth pipeline itself is
+  Phase 4 work.
+- Pyrra stays an optional SLO UI evaluated in Phase 4.
 
 ## Optional
 
 Optional capabilities are evaluated only when implementation requirements justify
-their cost and operational complexity:
+their cost and operational complexity. These are planned in
+`docs/18-phase-4-plan.md`:
 
 - Mimir for central or long-term metrics
 - Perses for dashboard-as-code PoC

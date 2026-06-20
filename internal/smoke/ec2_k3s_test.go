@@ -161,6 +161,7 @@ func TestRunnerErrorIncludesOutput(t *testing.T) {
 }
 
 func TestInstallK3sBasicDryRunDoesNotCallRunner(t *testing.T) {
+	chdirRepoRoot(t)
 	kubeconfig := filepath.Join(t.TempDir(), "kubeconfig.yaml")
 	if err := os.WriteFile(kubeconfig, []byte("apiVersion: v1\n"), 0o600); err != nil {
 		t.Fatal(err)
@@ -176,5 +177,91 @@ func TestInstallK3sBasicDryRunDoesNotCallRunner(t *testing.T) {
 	}
 	if len(runner.calls) != 0 {
 		t.Fatalf("runner calls = %d, want 0", len(runner.calls))
+	}
+}
+
+func TestInstallK3sPhase3DryRunDoesNotCallRunner(t *testing.T) {
+	chdirRepoRoot(t)
+	kubeconfig := filepath.Join(t.TempDir(), "kubeconfig.yaml")
+	if err := os.WriteFile(kubeconfig, []byte("apiVersion: v1\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	runner := &fakeRunner{}
+	err := run([]string{
+		"k3s-phase3", "install",
+		"--kubeconfig", kubeconfig,
+		"--dry-run",
+	}, runner)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(runner.calls) != 0 {
+		t.Fatalf("runner calls = %d, want 0", len(runner.calls))
+	}
+}
+
+func TestCreateLocalK3sDryRunDoesNotCallRunner(t *testing.T) {
+	runner := &fakeRunner{}
+	err := run([]string{
+		"local-k3s", "create",
+		"--name", "example-local",
+		"--kubeconfig", filepath.Join(t.TempDir(), "local-k3s.yaml"),
+		"--dry-run",
+	}, runner)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(runner.calls) != 0 {
+		t.Fatalf("runner calls = %d, want 0", len(runner.calls))
+	}
+}
+
+func TestDeleteLocalK3sDryRunDoesNotCallRunner(t *testing.T) {
+	runner := &fakeRunner{}
+	err := run([]string{
+		"local-k3s", "delete",
+		"--name", "example-local",
+		"--dry-run",
+	}, runner)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(runner.calls) != 0 {
+		t.Fatalf("runner calls = %d, want 0", len(runner.calls))
+	}
+}
+
+// chdirRepoRoot runs a test from the repository root so that smoke installers
+// can resolve repo-relative paths such as charts-lock/chart-versions.yaml.
+func chdirRepoRoot(t *testing.T) {
+	t.Helper()
+	cwd, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chdir(filepath.Join("..", "..")); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := os.Chdir(cwd); err != nil {
+			t.Fatal(err)
+		}
+	})
+}
+
+func TestRewriteK3dKubeconfigHostUsesLocalhost(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "kubeconfig.yaml")
+	if err := os.WriteFile(path, []byte("server: https://host.docker.internal:3118\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := rewriteK3dKubeconfigHost(path); err != nil {
+		t.Fatal(err)
+	}
+	rendered, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(rendered), "https://127.0.0.1:3118") {
+		t.Fatalf("rendered kubeconfig = %q, want localhost server", string(rendered))
 	}
 }

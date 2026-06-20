@@ -11,13 +11,25 @@ applies_to:
 This repository is a reusable Kubernetes Observability v2 standard repository.
 It is not a live operations repository and not a central multi-customer repo.
 
-Phase 0-2 scope:
+Implemented scope:
 
 - standard repository scaffold
 - human-facing standard documentation
 - Basic profile based on `kube-prometheus-stack`
+- Phase 3 profiles: Standard Logs (Loki + Alloy), Advanced Traces (Tempo), and
+  SLO-as-code samples
 - Argo CD templates using pinned chart versions and Git-hosted values
-- validation scripts and templates
+- Go validation CLI (`cmd/obsctl`) and templates
 
-Later profiles such as Loki, Alloy, Tempo, Mimir, Sloth, Pyrra, and Perses must
-not be implemented unless the task explicitly expands scope.
+Still out of scope unless a task explicitly expands it (roadmap in
+`docs/18-phase-4-plan.md`):
+
+- Mimir for central or long-term metrics
+- The Sloth generation pipeline and Pyrra as a dedicated SLO UI (Sloth is the
+  chosen generator; the pipeline itself is not yet implemented)
+- Perses dashboard-as-code
+- eBPF or profiling collectors and other optional UIs
+
+When extending a profile, follow `.agent/workflows/phase-3-profile-planning.md`
+and keep `charts-lock/chart-versions.yaml` as the single source of truth for
+pinned chart versions.

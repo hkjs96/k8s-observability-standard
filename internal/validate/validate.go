@@ -31,36 +31,39 @@ func Run(target string, opts Options) error {
 }
 
 func selectChecks(target string, opts Options) ([]Check, error) {
-	basicProfile := []Check{
-		{Name: "yaml", Fn: func() error { return YAML(opts) }},
-		{Name: "basic", Fn: func() error { return Basic(opts) }},
-		{Name: "prometheus", Fn: func() error { return PrometheusRules(opts) }},
-		{Name: "sensitive", Fn: SensitiveValues},
+	registry := map[string]func() error{
+		"yaml":       func() error { return YAML(opts) },
+		"charts":     Charts,
+		"basic":      func() error { return Basic(opts) },
+		"logs":       func() error { return Logs(opts) },
+		"traces":     func() error { return Traces(opts) },
+		"slo":        func() error { return SLO(opts) },
+		"argocd":     ArgoCD,
+		"prometheus": func() error { return PrometheusRules(opts) },
+		"sensitive":  SensitiveValues,
 	}
-	all := []Check{
-		{Name: "yaml", Fn: func() error { return YAML(opts) }},
-		{Name: "basic", Fn: func() error { return Basic(opts) }},
-		{Name: "logs", Fn: func() error { return Logs(opts) }},
-		{Name: "argocd", Fn: ArgoCD},
-		{Name: "prometheus", Fn: func() error { return PrometheusRules(opts) }},
-		{Name: "sensitive", Fn: SensitiveValues},
+	build := func(names ...string) []Check {
+		checks := make([]Check, 0, len(names))
+		for _, name := range names {
+			checks = append(checks, Check{Name: name, Fn: registry[name]})
+		}
+		return checks
 	}
 
-	if target == "" || target == "all" {
-		return all, nil
-	}
 	switch target {
+	case "", "all":
+		return build("yaml", "charts", "basic", "logs", "traces", "slo", "argocd", "prometheus", "sensitive"), nil
 	case "profile/basic":
-		return basicProfile, nil
+		return build("yaml", "basic", "prometheus", "sensitive"), nil
 	case "profile/logs":
-		return []Check{{Name: "logs", Fn: func() error { return Logs(opts) }}}, nil
-	case "profile/traces", "profile/slo":
-		return nil, fmt.Errorf("validation target %q is not implemented because the profile is not present in this repository", target)
+		return build("logs"), nil
+	case "profile/traces":
+		return build("traces"), nil
+	case "profile/slo":
+		return build("slo"), nil
 	}
-	for _, check := range all {
-		if check.Name == target {
-			return []Check{check}, nil
-		}
+	if _, ok := registry[target]; ok {
+		return build(target), nil
 	}
 	return nil, fmt.Errorf("unknown validation target %q", target)
 }

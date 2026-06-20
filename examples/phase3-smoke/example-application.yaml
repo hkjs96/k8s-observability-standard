@@ -1,0 +1,289 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: example-traced-backend
+  namespace: observability-smoke
+  labels:
+    app.kubernetes.io/name: example-traced-backend
+    app.kubernetes.io/component: smoke
+data:
+  app.py: |
+    import os
+    import time
+    from flask import Flask, jsonify
+    from opentelemetry import trace
+    from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+    from opentelemetry.instrumentation.flask import FlaskInstrumentor
+    from opentelemetry.sdk.resources import Resource
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.export import BatchSpanProcessor
+
+    service_name = os.getenv("OTEL_SERVICE_NAME", "example-traced-backend")
+    endpoint = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://tempo.observability-traces.svc.cluster.local:4317")
+
+    provider = TracerProvider(resource=Resource.create({"service.name": service_name}))
+    provider.add_span_processor(BatchSpanProcessor(OTLPSpanExporter(endpoint=endpoint, insecure=True)))
+    trace.set_tracer_provider(provider)
+
+    app = Flask(__name__)
+    FlaskInstrumentor().instrument_app(app)
+    tracer = trace.get_tracer(service_name)
+
+    @app.get("/work")
+    def work():
+      with tracer.start_as_current_span("backend-work"):
+        time.sleep(0.05)
+        return jsonify({"service": service_name, "status": "ok"})
+
+    @app.get("/healthz")
+    def healthz():
+      return "ok\n"
+
+    app.run(host="0.0.0.0", port=8080)
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: example-traced-frontend
+  namespace: observability-smoke
+  labels:
+    app.kubernetes.io/name: example-traced-frontend
+    app.kubernetes.io/component: smoke
+data:
+  app.py: |
+    import os
+    import requests
+    from flask import Flask, jsonify
+    from opentelemetry import trace
+    from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+    from opentelemetry.instrumentation.flask import FlaskInstrumentor
+    from opentelemetry.instrumentation.requests import RequestsInstrumentor
+    from opentelemetry.sdk.resources import Resource
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.export import BatchSpanProcessor
+
+    service_name = os.getenv("OTEL_SERVICE_NAME", "example-traced-frontend")
+    endpoint = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://tempo.observability-traces.svc.cluster.local:4317")
+    backend_url = os.getenv("BACKEND_URL", "http://example-traced-backend:8080/work")
+
+    provider = TracerProvider(resource=Resource.create({"service.name": service_name}))
+    provider.add_span_processor(BatchSpanProcessor(OTLPSpanExporter(endpoint=endpoint, insecure=True)))
+    trace.set_tracer_provider(provider)
+
+    app = Flask(__name__)
+    FlaskInstrumentor().instrument_app(app)
+    RequestsInstrumentor().instrument()
+    tracer = trace.get_tracer(service_name)
+
+    @app.get("/")
+    def index():
+      with tracer.start_as_current_span("frontend-call-backend"):
+        response = requests.get(backend_url, timeout=3)
+        response.raise_for_status()
+        return jsonify({"service": service_name, "backend": response.json()})
+
+    @app.get("/healthz")
+    def healthz():
+      return "ok\n"
+
+    app.run(host="0.0.0.0", port=8080)
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-traced-backend
+  namespace: observability-smoke
+  labels:
+    app.kubernetes.io/name: example-traced-backend
+    app.kubernetes.io/component: smoke
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: example-traced-backend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: example-traced-backend
+        app.kubernetes.io/component: smoke
+    spec:
+      containers:
+        - name: app
+          image: python:3.12-slim
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - |
+              pip install --no-cache-dir --target /tmp/otel-deps flask requests opentelemetry-sdk opentelemetry-exporter-otlp-proto-grpc opentelemetry-instrumentation-flask opentelemetry-instrumentation-requests
+              export PYTHONPATH=/tmp/otel-deps
+              python /app/app.py
+          env:
+            - name: OTEL_SERVICE_NAME
+              value: example-traced-backend
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://tempo.observability-traces.svc.cluster.local:4317
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - name: app
+              mountPath: /app
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 65534
+            seccompProfile:
+              type: RuntimeDefault
+      volumes:
+        - name: app
+          configMap:
+            name: example-traced-backend
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: example-traced-backend
+  namespace: observability-smoke
+  labels:
+    app.kubernetes.io/name: example-traced-backend
+    app.kubernetes.io/component: smoke
+spec:
+  selector:
+    app.kubernetes.io/name: example-traced-backend
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-traced-frontend
+  namespace: observability-smoke
+  labels:
+    app.kubernetes.io/name: example-traced-frontend
+    app.kubernetes.io/component: smoke
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: example-traced-frontend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: example-traced-frontend
+        app.kubernetes.io/component: smoke
+    spec:
+      containers:
+        - name: app
+          image: python:3.12-slim
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - |
+              pip install --no-cache-dir --target /tmp/otel-deps flask requests opentelemetry-sdk opentelemetry-exporter-otlp-proto-grpc opentelemetry-instrumentation-flask opentelemetry-instrumentation-requests
+              export PYTHONPATH=/tmp/otel-deps
+              python /app/app.py
+          env:
+            - name: OTEL_SERVICE_NAME
+              value: example-traced-frontend
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://tempo.observability-traces.svc.cluster.local:4317
+            - name: BACKEND_URL
+              value: http://example-traced-backend:8080/work
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - name: app
+              mountPath: /app
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 65534
+            seccompProfile:
+              type: RuntimeDefault
+      volumes:
+        - name: app
+          configMap:
+            name: example-traced-frontend
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: example-traced-frontend
+  namespace: observability-smoke
+  labels:
+    app.kubernetes.io/name: example-traced-frontend
+    app.kubernetes.io/component: smoke
+spec:
+  selector:
+    app.kubernetes.io/name: example-traced-frontend
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-traced-loadgen
+  namespace: observability-smoke
+  labels:
+    app.kubernetes.io/name: example-traced-loadgen
+    app.kubernetes.io/component: smoke
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: example-traced-loadgen
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: example-traced-loadgen
+        app.kubernetes.io/component: smoke
+    spec:
+      containers:
+        - name: loadgen
+          image: busybox:1.36
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - |
+              while true; do
+                wget -qO- http://example-traced-frontend:8080/ || true
+                sleep 5
+              done
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65534
+            seccompProfile:
+              type: RuntimeDefault

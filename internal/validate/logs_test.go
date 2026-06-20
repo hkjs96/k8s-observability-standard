@@ -10,6 +10,7 @@ func TestCheckLogLabelCardinalityAcceptsProfileValues(t *testing.T) {
 	root := t.TempDir()
 	mustWrite(t, root, "values/profiles/logs.yaml", "loki: {}\n")
 	mustWrite(t, root, "values/profiles/logs-alloy.yaml", "target_label = \"namespace\"\n")
+	mustWrite(t, root, "examples/phase3-smoke/log-generator.yaml", "app: example-log-generator\n")
 	withWorkingDir(t, root, func() {
 		if err := checkLogLabelCardinality(); err != nil {
 			t.Fatal(err)
@@ -21,6 +22,7 @@ func TestCheckLogLabelCardinalityRejectsHighCardinalityLabels(t *testing.T) {
 	root := t.TempDir()
 	mustWrite(t, root, "values/profiles/logs.yaml", "loki: {}\n")
 	mustWrite(t, root, "values/profiles/logs-alloy.yaml", "__meta_kubernetes_pod_uid\n")
+	mustWrite(t, root, "examples/phase3-smoke/log-generator.yaml", "app: example-log-generator\n")
 	withWorkingDir(t, root, func() {
 		if err := checkLogLabelCardinality(); err == nil {
 			t.Fatal("checkLogLabelCardinality() error = nil, want high-cardinality label error")

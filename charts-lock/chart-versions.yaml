@@ -31,3 +31,12 @@ spec:
       source: https://github.com/grafana/helm-charts/tree/main/charts/alloy
       notes:
         - "Pinned for the Phase 3 logs collector profile baseline."
+    tempo:
+      repository: https://grafana.github.io/helm-charts
+      chart: tempo
+      version: 1.24.4
+      appVersion: 2.9.0
+      source: https://github.com/grafana/helm-charts/tree/main/charts/tempo
+      notes:
+        - "Pinned for the Phase 3 traces profile baseline."
+        - "Single binary chart is deprecated upstream; revisit before production adoption."

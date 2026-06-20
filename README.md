@@ -3,16 +3,21 @@
 This repository is the reusable standard baseline for Kubernetes observability
 deployments. It is not a central multi-customer operations repository.
 
-The first implementation covers Phase 0-2 of the v2 standard:
+This standard covers:
 
 - standard decisions and profile documentation
 - repository scaffold for Helm values, Argo CD, dashboards, rules, policies,
   templates, and examples
 - Basic profile based on `kube-prometheus-stack`
+- Phase 3 profiles: Standard Logs (Loki + Alloy), Advanced Traces (Tempo), and
+  SLO-as-code samples
 
-Current status: Phase 0-2 Basic baseline is validation-ready. See
-`docs/08-phase-0-2-completion.md` for completed outputs, validation evidence,
-and known limits.
+Current status: the Basic baseline is the production-ready baseline, and the
+Phase 3 logs, traces, and SLO profiles are validation-ready reusable baselines
+(review their deployment-model caveats before production adoption). See
+`docs/08-phase-0-2-completion.md` for the Basic baseline evidence and
+`docs/14-logs-profile.md` through `docs/16-slo-profile.md` for the Phase 3
+profiles.
 
 For a disposable Basic profile runtime check, use the Amazon Linux 2023 k3s
 smoke-test material:
@@ -58,7 +63,9 @@ Mandatory agent execution rules live in `.agent/`, not `docs/`.
 
 `docs/` remains the human-facing standard and rationale.
 
-## Phase 0-2 Validation
+## Validation
+
+`obsctl` requires Go 1.22 or newer (matching `go.mod` and the CI workflow).
 
 Run these checks before using a change as a deployable baseline:
 

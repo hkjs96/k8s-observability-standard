@@ -1,9 +1,18 @@
+# PodSecurity Admission labels for the monitoring namespace.
+#
+# enforce is `privileged` on purpose: this namespace runs the
+# kube-prometheus-stack node-exporter DaemonSet, which requires host namespaces
+# (hostNetwork/hostPID) and hostPath volumes. Those are denied by the `baseline`
+# and `restricted` levels, so enforcing `baseline` here would block node-exporter
+# at admission and silently drop node-level metrics. audit/warn stay at
+# `restricted` to keep visibility into other workloads; node-exporter itself
+# surfaces expected warn/audit annotations.
 apiVersion: v1
 kind: Namespace
 metadata:
   name: monitoring
   labels:
-    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/enforce: privileged
     pod-security.kubernetes.io/audit: restricted
     pod-security.kubernetes.io/warn: restricted
     observability.standard/managed: "true"

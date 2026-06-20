@@ -21,9 +21,11 @@ Current targets:
 - `all`
 - `profile basic`
 - `profile logs`
+- `profile traces`
+- `profile slo`
 
-The `profile traces` and `profile slo` targets are reserved and return a clear
-not-implemented error until those profiles exist in this repository.
+All current profile targets are implemented for the resources present in this
+repository.
 
 ## Future Contract
 

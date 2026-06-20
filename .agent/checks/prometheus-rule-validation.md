@@ -18,5 +18,7 @@ go run ./cmd/obsctl validate prometheus
 Completion criteria:
 
 - Rule YAML parses.
-- Each deployable rule sample has a matching `.promtool.yaml` mirror file.
+- Each deployable rule sample has a `.promtool.yaml` mirror whose rule groups
+  match the `PrometheusRule` `spec.groups` exactly; only the Kubernetes wrapper
+  (apiVersion, kind, metadata) differs.
 - `promtool check rules` passes when promtool is available.

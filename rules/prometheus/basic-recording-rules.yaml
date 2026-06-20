@@ -4,7 +4,12 @@ metadata:
   name: basic-recording-rules
   namespace: monitoring
   labels:
+    app: kube-prometheus-stack
+    app.kubernetes.io/instance: kube-prometheus-stack
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/part-of: kube-prometheus-stack
     observability.standard/rule-source: standard
+    release: kube-prometheus-stack
 spec:
   groups:
     - name: basic.kubernetes.recording

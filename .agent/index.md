@@ -25,10 +25,11 @@ required `.agent/` files are read.
 | --- | --- |
 | `values/**` | `.agent/rules/profiles.md`, `.agent/workflows/update-values.md`, `.agent/checks/basic-validation.md` |
 | `argocd/**` | `.agent/rules/argocd.md`, `.agent/workflows/update-argocd-app.md`, `.agent/checks/argocd-validation.md` |
+| `charts-lock/**` | `.agent/rules/profiles.md`; run `go run ./cmd/obsctl validate charts` then `go run ./cmd/obsctl validate` (a version bump affects every render). |
 | `rules/**` | `.agent/workflows/add-prometheus-rule.md`, `.agent/checks/prometheus-rule-validation.md` |
 | `dashboards/**` | `.agent/workflows/add-dashboard.md`, `.agent/checks/sensitive-values.md` |
 | `policies/**` | `.agent/rules/repository-boundary.md`, `.agent/checks/basic-validation.md` |
-| `docs/10-phase-3-plan.md` | `.agent/workflows/phase-3-profile-planning.md`, `.agent/checks/phase-3-profile-validation.md` |
+| `docs/10-phase-3-plan.md`, `docs/18-phase-4-plan.md` | `.agent/workflows/phase-3-profile-planning.md`, `.agent/checks/phase-3-profile-validation.md` |
 | `docs/09-implementation-adoption.md`, `templates/implementation-adoption-checklist.template.md` | `.agent/workflows/implementation-adoption.md`, `.agent/checks/implementation-adoption-validation.md` |
 | Phase 3 profile values, rules, dashboards, or policies | `.agent/workflows/phase-3-profile-planning.md`, `.agent/checks/phase-3-profile-validation.md` |
 | `docs/**` | Use `.agent/rules/repository-boundary.md`; keep docs human-facing. |

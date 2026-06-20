@@ -55,7 +55,7 @@ func parseValidateArgs(args []string) (string, validate.Options, error) {
 			default:
 				return "", opts, fmt.Errorf("unknown validate profile %q", args[i])
 			}
-		case "all", "basic", "yaml", "sensitive", "argocd", "prometheus":
+		case "all", "basic", "yaml", "charts", "sensitive", "argocd", "prometheus":
 			target = arg
 		default:
 			return "", opts, fmt.Errorf("unknown validate argument %q", arg)
@@ -68,10 +68,12 @@ func usage() error {
 	fmt.Println(`obsctl validates the Kubernetes observability standard repository.
 
 Usage:
-  obsctl validate [--strict-tools] [all|basic|yaml|sensitive|argocd|prometheus]
+  obsctl validate [--strict-tools] [all|basic|yaml|charts|sensitive|argocd|prometheus]
   obsctl validate profile [basic|logs|traces|slo] [--strict-tools]
   obsctl smoke ec2-k3s [launch|fetch-kubeconfig|terminate] [options]
+  obsctl smoke local-k3s [create|delete] [options]
   obsctl smoke k3s-basic install [options]
+  obsctl smoke k3s-phase3 install [options]
 
 Default:
   obsctl validate all
